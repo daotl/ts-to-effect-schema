@@ -1,6 +1,6 @@
-import ts from "typescript";
+import ts from 'typescript'
 
-const { factory: f } = ts;
+const { factory: f } = ts
 
 /**
  * Type hint zod to deal with recursive types.
@@ -10,12 +10,12 @@ const { factory: f } = ts;
 export function transformRecursiveSchema(
   zodImportValue: string,
   zodStatement: ts.VariableStatement,
-  typeName: string
+  typeName: string,
 ): ts.VariableStatement {
-  const declaration = zodStatement.declarationList.declarations[0];
+  const declaration = zodStatement.declarationList.declarations[0]
 
   if (!declaration.initializer) {
-    throw new Error("Unvalid zod statement");
+    throw new Error('Unvalid zod statement')
   }
 
   return f.createVariableStatement(
@@ -31,7 +31,7 @@ export function transformRecursiveSchema(
           f.createCallExpression(
             f.createPropertyAccessExpression(
               f.createIdentifier(zodImportValue),
-              f.createIdentifier("lazy")
+              f.createIdentifier('lazy'),
             ),
             undefined,
             [
@@ -41,13 +41,13 @@ export function transformRecursiveSchema(
                 [],
                 undefined,
                 undefined,
-                declaration.initializer
+                declaration.initializer,
               ),
-            ]
-          )
+            ],
+          ),
         ),
       ],
-      ts.NodeFlags.Const
-    )
-  );
+      ts.NodeFlags.Const,
+    ),
+  )
 }

@@ -1,0 +1,61 @@
+{
+  "$schema": "./node_modules/rome/configuration_schema.json",
+  "files": {
+    "ignore": [
+      "**/dist",
+      "**/*.json"
+    ]
+  },
+  "linter": {
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "recommended": true
+      },
+      "complexity": {
+        "recommended": true,
+        "noUselessFragments": "error"
+      },
+      "correctness": {
+        "recommended": true,
+        "noUndeclaredVariables": "error",
+        "noUnusedVariables": "error"
+      },
+      "performance": {
+        "recommended": true
+      },
+      "security": {
+        "recommended": true
+      },
+      "style": {
+        "recommended": true,
+        "noShoutyConstants": "error",
+        "useBlockStatements": "error",
+        "useFragmentSyntax": "error",
+        "useShorthandArrayType": "error"
+      },
+      "suspicious": {
+        "recommended": true
+      }
+    }
+  },
+  "formatter": {
+    "formatWithErrors": true,
+    "indentStyle": "space"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "asNeeded"
+    },
+    "globals": [
+      "describe",
+      "beforeAll",
+      "afterAll",
+      "beforeEach",
+      "afterEach",
+      "it",
+      "expect"
+    ]
+  }
+}

@@ -1,5 +1,5 @@
-import slash from "slash";
-import { parse, relative } from "path";
+import slash from 'slash'
+import { parse, relative } from 'path'
 
 /**
  * Resolve the path of an import.
@@ -9,8 +9,8 @@ import { parse, relative } from "path";
  * @returns relative path without extension
  */
 export function getImportPath(from: string, to: string) {
-  const relativePath = slash(relative(from, to).slice(1));
-  const { dir, name } = parse(relativePath);
+  const relativePath = slash(relative(from, to).slice(1))
+  const { dir, name } = parse(relativePath)
 
-  return `${dir}/${name}`;
+  return `${dir}/${name}`
 }

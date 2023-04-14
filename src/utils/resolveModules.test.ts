@@ -1,14 +1,14 @@
-import ts from "typescript";
-import { resolveModules } from "./resolveModules";
+import ts from 'typescript'
+import { resolveModules } from './resolveModules'
 
-describe("resolveModules", () => {
-  it("should prefix interface", () => {
+describe('resolveModules', () => {
+  it('should prefix interface', () => {
     const sourceText = `export namespace Metropolis {
       export interface Superman {
         name: string;
         hasPower: boolean;
       }
-    }`;
+    }`
 
     expect(print(resolveModules(sourceText))).toMatchInlineSnapshot(`
       "export interface MetropolisSuperman {
@@ -16,27 +16,27 @@ describe("resolveModules", () => {
           hasPower: boolean;
       }
       "
-    `);
-  });
+    `)
+  })
 
-  it("should prefix type", () => {
+  it('should prefix type', () => {
     const sourceText = `export namespace Metropolis {
       export type Name = "superman" | "clark kent" | "kal-l";
-    }`;
+    }`
 
     expect(print(resolveModules(sourceText))).toMatchInlineSnapshot(`
       "export type MetropolisName = \\"superman\\" | \\"clark kent\\" | \\"kal-l\\";
       "
-    `);
-  });
+    `)
+  })
 
-  it("should prefix enum", () => {
+  it('should prefix enum', () => {
     const sourceText = `export namespace Metropolis {
       export enum Superhero {
         Superman = "superman",
         ClarkKent = "clark_kent",
       };
-    }`;
+    }`
 
     expect(print(resolveModules(sourceText))).toMatchInlineSnapshot(`
       "export enum MetropolisSuperhero {
@@ -45,10 +45,10 @@ describe("resolveModules", () => {
       }
       ;
       "
-    `);
-  });
+    `)
+  })
 
-  it("should prefix every type references", () => {
+  it('should prefix every type references', () => {
     const sourceText = `
     export type Weakness = "krytonite" | "lois"
 
@@ -78,7 +78,7 @@ describe("resolveModules", () => {
       export interface ExtendedSuperman extends Superman, Clark {
         hasEvenMorePower: boolean;
       }
-    }`;
+    }`
 
     expect(print(resolveModules(sourceText))).toMatchInlineSnapshot(`
       "export type Weakness = \\"krytonite\\" | \\"lois\\";
@@ -109,9 +109,9 @@ describe("resolveModules", () => {
           hasEvenMorePower: boolean;
       }
       "
-    `);
-  });
-});
+    `)
+  })
+})
 
-const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-const print = (sourceFile: ts.SourceFile) => printer.printFile(sourceFile);
+const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
+const print = (sourceFile: ts.SourceFile) => printer.printFile(sourceFile)

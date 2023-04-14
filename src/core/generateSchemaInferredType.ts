@@ -1,10 +1,10 @@
-import * as ts from "typescript";
-const { factory: f } = ts;
+import * as ts from 'typescript'
+const { factory: f } = ts
 
 export interface GenerateZodInferredTypeProps {
-	aliasName: string;
-	zodImportValue: string;
-	zodConstName: string;
+  aliasName: string
+  zodImportValue: string
+  zodConstName: string
 }
 
 /**
@@ -15,21 +15,21 @@ export interface GenerateZodInferredTypeProps {
  * ```
  */
 export function generateSchemaInferredType({
-	aliasName,
-	zodImportValue,
-	zodConstName,
+  aliasName,
+  zodImportValue,
+  zodConstName,
 }: GenerateZodInferredTypeProps) {
-	return f.createTypeAliasDeclaration(
-		undefined,
-		[f.createModifier(ts.SyntaxKind.ExportKeyword)],
-		f.createIdentifier(aliasName),
-		undefined,
-		f.createTypeReferenceNode(
-			f.createQualifiedName(
-				f.createIdentifier(zodImportValue),
-				f.createIdentifier("infer"),
-			),
-			[f.createTypeQueryNode(f.createIdentifier(zodConstName))],
-		),
-	);
+  return f.createTypeAliasDeclaration(
+    undefined,
+    [f.createModifier(ts.SyntaxKind.ExportKeyword)],
+    f.createIdentifier(aliasName),
+    undefined,
+    f.createTypeReferenceNode(
+      f.createQualifiedName(
+        f.createIdentifier(zodImportValue),
+        f.createIdentifier('infer'),
+      ),
+      [f.createTypeQueryNode(f.createIdentifier(zodConstName))],
+    ),
+  )
 }

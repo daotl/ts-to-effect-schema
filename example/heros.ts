@@ -1,99 +1,98 @@
 export enum EnemyPower {
-  Flight = "flight",
-  Strength = "strength",
-  Speed = "speed",
+  Flight = 'flight',
+  Strength = 'strength',
+  Speed = 'speed',
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Skills {
   export type SpeedEnemy = {
-    power: EnemyPower.Speed;
-  };
+    power: EnemyPower.Speed
+  }
 }
 
 export interface Enemy {
-  name: string;
-  powers: EnemyPower[];
-  inPrison: boolean;
+  name: string
+  powers: EnemyPower[]
+  inPrison: boolean
 }
 
-export type SupermanEnemy = Superman["enemies"][-1];
-export type SupermanName = Superman["name"];
-export type SupermanInvinciblePower = Superman["powers"][2];
+export type SupermanEnemy = Superman['enemies'][-1]
+export type SupermanName = Superman['name']
+export type SupermanInvinciblePower = Superman['powers'][2]
 
 export interface Superman {
-  name: "superman" | "clark kent" | "kal-l";
-  enemies: Record<string, Enemy>;
-  age: number;
-  underKryptonite?: boolean;
-  powers: ["fly", "laser", "invincible"];
+  name: 'superman' | 'clark kent' | 'kal-l'
+  enemies: Record<string, Enemy>
+  age: number
+  underKryptonite?: boolean
+  powers: ['fly', 'laser', 'invincible']
 }
 
 export interface Villain {
-  name: string;
-  powers: EnemyPower[];
-  friends: Villain[];
-  canBeTrusted: never;
+  name: string
+  powers: EnemyPower[]
+  friends: Villain[]
+  canBeTrusted: never
 }
 
 export interface EvilPlan {
-  owner: Villain;
-  description: string;
-  details: EvilPlanDetails;
+  owner: Villain
+  description: string
+  details: EvilPlanDetails
 }
 
 export interface EvilPlanDetails {
-  parent: EvilPlan; // <- Unsolvable circular reference
-  steps: string[];
+  parent: EvilPlan // <- Unsolvable circular reference
+  steps: string[]
 }
 
-export type Story = [subject: string, problems: string[]];
-export type KrytonResponse = Promise<boolean>;
+export type Story = [subject: string, problems: string[]]
+export type KrytonResponse = Promise<boolean>
 export type KillSuperman = (
   withKryptonite: boolean,
-  method: string
-) => Promise<boolean>;
+  method: string,
+) => Promise<boolean>
 
 export interface WithDefaults {
   /**
    * @default 42
    */
-  theAnswerToTheUltimateQuestionOfLife: number;
+  theAnswerToTheUltimateQuestionOfLife: number
   /**
    * @default false
    */
-  isVulnerable: boolean;
+  isVulnerable: boolean
   /**
    * @default clark
    */
-  name: "clark" | "superman" | "kal-l";
+  name: 'clark' | 'superman' | 'kal-l'
   /**
    * @default The Answer to the Ultimate Question of Life
    */
-  theMeaningOf42: string;
+  theMeaningOf42: string
   /**
    * @default ""
    */
-  emptyString?: string;
+  emptyString?: string
   /**
    * @default "true"
    */
-  booleanAsString: string;
+  booleanAsString: string
 }
 
 interface NonExported {
-  name: string;
+  name: string
 }
 
 export interface Exported {
-  a: NonExported;
-  b: string;
+  a: NonExported
+  b: string
 }
 
 export type GetSupermanSkill = (
   skillName: string,
-  withKryptonite?: boolean
-) => string;
+  withKryptonite?: boolean,
+) => string
 
 export interface HeroContact {
   /**
@@ -101,7 +100,7 @@ export interface HeroContact {
    *
    * @format email
    */
-  email: string;
+  email: string
 
   /**
    * The name of the hero.
@@ -109,21 +108,21 @@ export interface HeroContact {
    * @minLength 2
    * @maxLength 50
    */
-  name: string;
+  name: string
 
   /**
    * The phone number of the hero.
    *
    * @pattern ^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$
    */
-  phoneNumber: string;
+  phoneNumber: string
 
   /**
    * Does the hero has super power?
    *
    * @default true
    */
-  hasSuperPower?: boolean;
+  hasSuperPower?: boolean
 
   /**
    * The age of the hero
@@ -131,5 +130,5 @@ export interface HeroContact {
    * @minimum 0
    * @maximum 500
    */
-  age: number;
+  age: number
 }

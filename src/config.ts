@@ -4,69 +4,69 @@ export interface SimplifiedJSDocTag {
    *
    * @ref tag.tagName.escapedText.toString()
    */
-  name: string;
+  name: string
 
   /**
    * Value of the tag
    *
    * @ref tag.comment
    */
-  value?: string;
+  value?: string
 }
 
-export type GetSchemaName = (identifier: string) => string;
-export type NameFilter = (name: string) => boolean;
-export type JSDocTagFilter = (tags: SimplifiedJSDocTag[]) => boolean;
+export type GetSchemaName = (identifier: string) => string
+export type NameFilter = (name: string) => boolean
+export type JSDocTagFilter = (tags: SimplifiedJSDocTag[]) => boolean
 
 export type Config = {
   /**
    * Path of the input file (types source)
    */
-  input: string;
+  input: string
 
   /**
    * Path of the output file (generated zod schemas)
    */
-  output: string;
+  output: string
 
   /**
    * Skip the validation step (not recommended)
    */
-  skipValidation?: boolean;
+  skipValidation?: boolean
 
   /**
    * Filter on type/interface name.
    */
-  nameFilter?: NameFilter;
+  nameFilter?: NameFilter
 
   /**
    * Filter on JSDocTag.
    */
-  jsDocTagFilter?: JSDocTagFilter;
+  jsDocTagFilter?: JSDocTagFilter
 
   /**
    * Schema name generator.
    */
-  getSchemaName?: GetSchemaName;
+  getSchemaName?: GetSchemaName
 
   /**
    * Keep parameters comments.
    * @default false
    */
-  keepComments?: boolean;
+  keepComments?: boolean
 
   /**
    * Skip the creation of zod validators from JSDoc annotations
    *
    * @default false
    */
-  skipParseJSDoc?: boolean;
+  skipParseJSDoc?: boolean
 
   /**
    * Path of z.infer<> types file.
    */
-  inferredTypes?: string;
-};
+  inferredTypes?: string
+}
 
 export type Configs = Array<
   Config & {
@@ -75,8 +75,8 @@ export type Configs = Array<
      *
      * Usage: `ts-to-effect-schema --config {name}`
      */
-    name: string;
+    name: string
   }
->;
+>
 
-export type TsToZodConfig = Config | Configs;
+export type TsToZodConfig = Config | Configs

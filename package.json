@@ -20,14 +20,14 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.package.json",
-    "prepublishOnly": "yarn test:ci && rimraf lib && yarn build",
-    "format": "eslint **/*.{js,jsx,ts,tsx} --fix && prettier **/*.{js,jsx,ts,tsx,json} --write",
+    "prepublishOnly": "pnpm test:ci && rimraf lib && pnpm build",
+    "lint": "npx rome format . && npx rome check .",
+    "lint:fix": "npx rome format --write . && npx rome check --apply .",
     "test": "jest",
-    "test:ci": "jest --ci --coverage && yarn gen:all && tsc --noEmit",
+    "test:ci": "jest --ci --coverage && pnpm gen:all && tsc --noEmit",
     "gen:all": "./bin/run --all",
     "gen:example": "./bin/run --config example",
-    "gen:config": "./bin/run --config config",
-    "prepare": "husky install"
+    "gen:config": "./bin/run --config config"
   },
   "files": [
     "LICENSE",
@@ -57,18 +57,18 @@
     "lodash": "^4.17.21",
     "lz-string": "^1.4.4",
     "ora": "^5.4.0",
-    "prettier": "2.2.1",
     "rxjs": "^7.4.0",
     "slash": "^3.0.0",
     "threads": "^1.7.0",
     "tslib": "^2.3.1",
     "tsutils": "^3.21.0",
-    "typescript": "^4.5.2",
+    "typescript": "^4.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
+    "@daotl/rome-config": "0.0.1-alpha.4",
     "@types/async": "^3.2.6",
     "@types/fs-extra": "^9.0.9",
     "@types/inquirer": "^8.1.3",
@@ -76,18 +76,13 @@
     "@types/lodash": "^4.14.168",
     "@types/lz-string": "^1.3.34",
     "@types/node": "^12.7.11",
-    "@typescript-eslint/eslint-plugin": "^4.17.0",
-    "@typescript-eslint/parser": "^4.17.0",
     "auto-changelog": "^2.2.1",
     "babel-jest": "^27.5.1",
     "codecov": "^3.8.1",
-    "eslint": "^7.22.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "husky": "^5.2.0",
     "jest": "^27.5.1",
     "pretty-quick": "^3.1.0",
     "rimraf": "^3.0.2",
+    "rome": "^12.0.0",
     "ts-node": "^10.9.1"
   },
   "jest": {
@@ -95,11 +90,6 @@
     "testMatch": [
       "**/*.test.ts"
     ]
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "trailingComma": "es5"
   },
   "oclif": {
     "bin": "ts-to-effect-schema"
