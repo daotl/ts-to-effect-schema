@@ -1,14 +1,14 @@
 export { generate, GenerateProps } from "./core/generate";
 
 export {
-  generateZodInferredType,
-  GenerateZodInferredTypeProps,
-} from "./core/generateZodInferredType";
+	generateSchemaInferredType,
+	GenerateZodInferredTypeProps,
+} from "./core/generateSchemaInferredType";
 
 export {
-  generateZodSchemaVariableStatement,
-  GenerateZodSchemaProps,
-} from "./core/generateZodSchema";
+	generateSchemaVariableStatement,
+	GenerateZodSchemaProps,
+} from "./core/generateSchema";
 
 export { generateIntegrationTests } from "./core/generateIntegrationTests";
 

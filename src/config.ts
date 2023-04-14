@@ -73,7 +73,7 @@ export type Configs = Array<
     /**
      * Name of the config.
      *
-     * Usage: `ts-to-zod --config {name}`
+     * Usage: `ts-to-effect-schema --config {name}`
      */
     name: string;
   }

@@ -1,21 +1,22 @@
 {
-  "name": "ts-to-zod",
-  "description": "Generate zod schemas from typescript types/interfaces",
-  "version": "3.0.0",
-  "homepage": "https://github.com/fabien0102/ts-to-zod",
-  "bugs": "https://github.com/fabien0102/ts-to-zod/issues",
-  "repository": "fabien0102/ts-to-zod",
+  "name": "ts-to-effect-schema",
+  "description": "Generate @effect/schema schemas from TypeScript types/interfaces",
+  "version": "0.0.1",
+  "homepage": "https://github.com/daotl/ts-to-effect-schema",
+  "bugs": "https://github.com/daotl/ts-to-effect-schema/issues",
+  "repository": "daotl/ts-to-effect-schema",
   "keywords": [
-    "zod",
+    "effect",
+    "schema",
     "typescript",
     "generator",
     "oclif"
   ],
-  "author": "Fabien Bernard @fabien0102",
+  "author": "DAOT Labs",
   "types": "lib/index.d.ts",
   "main": "lib/index.js",
   "bin": {
-    "ts-to-zod": "bin/run"
+    "ts-to-effect-schema": "bin/run"
   },
   "scripts": {
     "build": "tsc -p tsconfig.package.json",
@@ -31,12 +32,18 @@
   "files": [
     "LICENSE",
     "README.md",
-    "ts-to-zod-logo.svg",
+    "ts-to-effect-schema-logo.svg",
     "lib",
     "bin"
   ],
   "license": "MIT",
+  "resolutions": {
+    "@effect/data": "^0.12.2",
+    "@effect/schema": "^0.12.1"
+  },
   "dependencies": {
+    "@effect/data": "^0.12.2",
+    "@effect/schema": "^0.12.1",
     "@oclif/command": "^1.8.6",
     "@oclif/config": "^1.17.1",
     "@oclif/errors": "^1.3",
@@ -57,7 +64,6 @@
     "tslib": "^2.3.1",
     "tsutils": "^3.21.0",
     "typescript": "^4.5.2",
-    "zod": "^3.11.6"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
@@ -96,6 +102,6 @@
     "trailingComma": "es5"
   },
   "oclif": {
-    "bin": "ts-to-zod"
+    "bin": "ts-to-effect-schema"
   }
 }
