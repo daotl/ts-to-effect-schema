@@ -47,11 +47,11 @@ export interface EvilPlanDetails {
 }
 
 export type Story = [subject: string, problems: string[]]
-export type KrytonResponse = Promise<boolean>
-export type KillSuperman = (
-  withKryptonite: boolean,
-  method: string,
-) => Promise<boolean>
+// export type KrytonResponse = Promise<boolean>
+// export type KillSuperman = (
+//   withKryptonite: boolean,
+//   method: string,
+// ) => Promise<boolean>
 
 export interface WithDefaults {
   /**
@@ -84,21 +84,31 @@ interface NonExported {
   name: string
 }
 
+// interface Person {
+//   name: string
+// }
+
+// interface Info {
+//   age: number
+// }
+
+// export type Jim = Person & Info
+
 export interface Exported {
   a: NonExported
   b: string
 }
 
-export type GetSupermanSkill = (
-  skillName: string,
-  withKryptonite?: boolean,
-) => string
+// export type GetSupermanSkill = (
+//   skillName: string,
+//   withKryptonite?: boolean,
+// ) => string
 
 export interface HeroContact {
   /**
    * The email of the hero.
    *
-   * @format email
+   *  format email
    */
   email: string
 

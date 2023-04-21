@@ -39,14 +39,17 @@
   "license": "MIT",
   "resolutions": {
     "@effect/data": "^0.12.2",
-    "@effect/schema": "^0.12.1"
+    "@effect/io": "^0.24.2",
+    "@effect/schema": "^0.15.0"
   },
   "dependencies": {
     "@effect/data": "^0.12.2",
-    "@effect/schema": "^0.12.1",
+    "@effect/io": "^0.24.2",
+    "@effect/schema": "^0.14.1",
     "@oclif/command": "^1.8.6",
     "@oclif/config": "^1.17.1",
     "@oclif/errors": "^1.3",
+    "@oclif/parser": "^3.8.10",
     "@oclif/plugin-help": "^3.2.7",
     "@typescript/vfs": "^1.3.5",
     "async": "^3.2.0",
@@ -57,12 +60,14 @@
     "lodash": "^4.17.21",
     "lz-string": "^1.4.4",
     "ora": "^5.4.0",
+    "prettier": "2.2.1",
     "rxjs": "^7.4.0",
     "slash": "^3.0.0",
     "threads": "^1.7.0",
     "tslib": "^2.3.1",
     "tsutils": "^3.21.0",
-    "typescript": "^4.5.2"
+    "typescript": "5.0.4",
+    "zod": "^3.11.6"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
@@ -79,11 +84,13 @@
     "auto-changelog": "^2.2.1",
     "babel-jest": "^27.5.1",
     "codecov": "^3.8.1",
+    "husky": "^5.2.0",
     "jest": "^27.5.1",
     "pretty-quick": "^3.1.0",
     "rimraf": "^3.0.2",
     "rome": "^12.0.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "type-fest": "^3.8.0"
   },
   "jest": {
     "testEnvironment": "node",
@@ -91,7 +98,12 @@
       "**/*.test.ts"
     ]
   },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "trailingComma": "es5"
+  },
   "oclif": {
-    "bin": "ts-to-effect-schema"
+    "bin": "ts-to-zod"
   }
 }

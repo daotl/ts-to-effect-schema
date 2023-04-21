@@ -2,19 +2,19 @@ import ts from 'typescript'
 import { generateSchemaInferredType } from './generateSchemaInferredType'
 
 describe('generateSchemaInferredType', () => {
-  it('should generate inferred type zod schema', () => {
+  it('should generate inferred type effect schema', () => {
     const sourceFile = ts.createSourceFile(
       'index.ts',
-      `export const supermanSchema = z.object({
-      name: z.string(),
+      `export const supermanSchema = S.struct({
+      name: S.string,
     })`,
       ts.ScriptTarget.Latest,
     )
 
     const output = generateSchemaInferredType({
       aliasName: 'Superman',
-      zodConstName: 'supermanSchema',
-      zodImportValue: 'z',
+      effectConstName: 'supermanSchema',
+      effectImportValue: 'S',
     })
 
     const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
@@ -22,7 +22,7 @@ describe('generateSchemaInferredType', () => {
     expect(
       printer.printNode(ts.EmitHint.Unspecified, output, sourceFile),
     ).toMatchInlineSnapshot(
-      `"export type Superman = z.infer<typeof supermanSchema>;"`,
+      `"export type Superman = S.To<typeof supermanSchema>;"`,
     )
   })
 })

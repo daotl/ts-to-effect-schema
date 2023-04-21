@@ -4,16 +4,21 @@ import * as ts from 'typescript'
 import { findNode } from '../utils/findNode'
 import { isNotNull } from '../utils/isNotNull'
 import {
+  callPipe,
+  callCreateCallExpression,
+  callCreatePropertyAccessExpression,
+} from '../utils/commonSchema'
+import {
   getJSDocTags,
   JSDocTags,
-  jsDocTagToZodProperties,
-  ZodProperty,
+  jsDocTagToEffectSchemaProperties,
+  EffectSchemaProperty,
 } from './jsDocTags'
-import { standardBuiltInObjects } from './const'
+import { standardBuiltInObjects, primitivePropertyList } from './const'
 
 const { factory: f } = ts
 
-export interface GenerateZodSchemaProps {
+export interface GenerateEffectSchemaProps {
   /**
    * Name of the exported variable
    */
@@ -30,11 +35,11 @@ export interface GenerateZodSchemaProps {
   node?: ts.InterfaceDeclaration | ts.TypeAliasDeclaration | ts.EnumDeclaration
 
   /**
-   * Zod import value.
+   * effect schema import value.
    *
-   * @default "z"
+   * @default "S"
    */
-  zodImportValue?: string
+  schemaImportValue?: string
 
   /**
    * Source file
@@ -49,7 +54,7 @@ export interface GenerateZodSchemaProps {
   getDependencyName?: (identifierName: string) => string
 
   /**
-   * Skip the creation of zod validators from JSDoc annotations
+   * Skip the creation of effect schema validators from JSDoc annotations
    *
    * @default false
    */
@@ -57,10 +62,10 @@ export interface GenerateZodSchemaProps {
 }
 
 /**
- * Generate zod schema declaration
+ * Generate effect schema declaration
  *
  * ```ts
- * export const ${varName} = ${zodImportValue}.object(…)
+ * export const ${varName} = ${schemaImportValue}.object(…)
  * ```
  */
 export function generateSchemaVariableStatement({
@@ -68,10 +73,10 @@ export function generateSchemaVariableStatement({
   typeName,
   sourceFile,
   varName,
-  zodImportValue = 'z',
+  schemaImportValue = 'S',
   getDependencyName = (identifierName) => camel(`${identifierName}Schema`),
   skipParseJSDoc = false,
-}: GenerateZodSchemaProps) {
+}: GenerateEffectSchemaProps) {
   let schema:
     | ts.CallExpression
     | ts.Identifier
@@ -82,8 +87,8 @@ export function generateSchemaVariableStatement({
 
   if (!node) {
     if (standardBuiltInObjects.includes(typeName!)) {
-      schema = buildZodSchema(zodImportValue, 'instanceof', [
-        f.createIdentifier(typeName!),
+      schema = buildEffectSchema(schemaImportValue, 'instanceof', [
+        f.createIdentifier(typeName as string),
       ])
       requiresImport = false
     }
@@ -113,10 +118,10 @@ export function generateSchemaVariableStatement({
       dependencies = dependencies.concat(schemaExtensionClauses)
     }
 
-    schema = buildZodObject({
+    schema = buildEffectSchemaObject({
       typeNode: node,
       sourceFile,
-      z: zodImportValue,
+      S: schemaImportValue,
       dependencies,
       getDependencyName,
       schemaExtensionClauses,
@@ -128,8 +133,8 @@ export function generateSchemaVariableStatement({
     }
     const jsDocTags = skipParseJSDoc ? {} : getJSDocTags(node, sourceFile)
 
-    schema = buildZodPrimitive({
-      z: zodImportValue,
+    schema = buildEffectSchemaPrimitive({
+      S: schemaImportValue,
       typeNode: node.type,
       isOptional: false,
       jsDocTags,
@@ -139,7 +144,7 @@ export function generateSchemaVariableStatement({
       skipParseJSDoc,
     })
   } else if (ts.isEnumDeclaration(node)) {
-    schema = buildZodSchema(zodImportValue, 'nativeEnum', [node.name])
+    schema = buildEffectSchema(schemaImportValue, 'enums', [node.name])
     requiresImport = true
   }
 
@@ -163,16 +168,16 @@ export function generateSchemaVariableStatement({
   }
 }
 
-function buildZodProperties({
+function buildEffectSchemaProperties({
   members,
-  zodImportValue: z,
+  schemaImportValue: S,
   sourceFile,
   dependencies,
   getDependencyName,
   skipParseJSDoc,
 }: {
   members: ts.NodeArray<ts.TypeElement> | ts.PropertySignature[]
-  zodImportValue: string
+  schemaImportValue: string
   sourceFile: ts.SourceFile
   dependencies: string[]
   getDependencyName: (identifierName: string) => string
@@ -200,8 +205,8 @@ function buildZodProperties({
 
     properties.set(
       member.name,
-      buildZodPrimitive({
-        z,
+      buildEffectSchemaPrimitive({
+        S,
         typeNode: member.type,
         isOptional,
         jsDocTags,
@@ -215,8 +220,8 @@ function buildZodProperties({
   return properties
 }
 
-function buildZodPrimitive({
-  z,
+function buildEffectSchemaPrimitive({
+  S,
   typeNode,
   isOptional,
   isNullable,
@@ -228,7 +233,7 @@ function buildZodPrimitive({
   getDependencyName,
   skipParseJSDoc,
 }: {
-  z: string
+  S: string
   typeNode: ts.TypeNode
   isOptional: boolean
   isNullable?: boolean
@@ -240,7 +245,7 @@ function buildZodPrimitive({
   getDependencyName: (identifierName: string) => string
   skipParseJSDoc: boolean
 }): ts.CallExpression | ts.Identifier | ts.PropertyAccessExpression {
-  const zodProperties = jsDocTagToZodProperties(
+  const effectSchemaProperties = jsDocTagToEffectSchemaProperties(
     jsDocTags,
     isOptional,
     Boolean(isPartial),
@@ -249,8 +254,8 @@ function buildZodPrimitive({
   )
 
   if (ts.isParenthesizedTypeNode(typeNode)) {
-    return buildZodPrimitive({
-      z,
+    return buildEffectSchemaPrimitive({
+      S,
       typeNode: typeNode.type,
       isOptional,
       jsDocTags,
@@ -266,8 +271,8 @@ function buildZodPrimitive({
 
     // Deal with `Array<>` syntax
     if (identifierName === 'Array' && typeNode.typeArguments) {
-      return buildZodPrimitive({
-        z,
+      return buildEffectSchemaPrimitive({
+        S,
         typeNode: f.createArrayTypeNode(typeNode.typeArguments[0]),
         isOptional,
         isNullable,
@@ -281,8 +286,8 @@ function buildZodPrimitive({
 
     // Deal with `Partial<>` syntax
     if (identifierName === 'Partial' && typeNode.typeArguments) {
-      return buildZodPrimitive({
-        z,
+      return buildEffectSchemaPrimitive({
+        S,
         typeNode: typeNode.typeArguments[0],
         isOptional,
         isNullable,
@@ -297,8 +302,8 @@ function buildZodPrimitive({
 
     // Deal with `Required<>` syntax
     if (identifierName === 'Required' && typeNode.typeArguments) {
-      return buildZodPrimitive({
-        z,
+      return buildEffectSchemaPrimitive({
+        S,
         typeNode: typeNode.typeArguments[0],
         isOptional,
         isNullable,
@@ -313,8 +318,8 @@ function buildZodPrimitive({
 
     // Deal with `Readonly<>` syntax
     if (identifierName === 'Readonly' && typeNode.typeArguments) {
-      return buildZodPrimitive({
-        z,
+      return buildEffectSchemaPrimitive({
+        S,
         typeNode: typeNode.typeArguments[0],
         isOptional,
         isNullable,
@@ -328,12 +333,12 @@ function buildZodPrimitive({
 
     // Deal with `ReadonlyArray<>` syntax
     if (identifierName === 'ReadonlyArray' && typeNode.typeArguments) {
-      return buildZodSchema(
-        z,
+      return buildEffectSchema(
+        S,
         'array',
         [
-          buildZodPrimitive({
-            z,
+          buildEffectSchemaPrimitive({
+            S,
             typeNode: typeNode.typeArguments[0],
             isOptional: false,
             jsDocTags: {},
@@ -343,7 +348,7 @@ function buildZodPrimitive({
             skipParseJSDoc,
           }),
         ],
-        zodProperties,
+        effectSchemaProperties,
       )
     }
 
@@ -356,15 +361,19 @@ function buildZodPrimitive({
         throw new Error(
           `Record<${typeNode.typeArguments[0].getText(
             sourceFile,
-          )}, …> are not supported (https://github.com/colinhacks/zod/tree/v3#records)`,
+          )}, …> are not supported (https://github.com/effect-ts/schema#records)`,
         )
       }
-      return buildZodSchema(
-        z,
+      return buildEffectSchema(
+        S,
         'record',
         [
-          buildZodPrimitive({
-            z,
+          f.createPropertyAccessExpression(
+            f.createIdentifier(S),
+            f.createIdentifier('string'),
+          ),
+          buildEffectSchemaPrimitive({
+            S,
             typeNode: typeNode.typeArguments[1],
             isOptional: false,
             jsDocTags,
@@ -375,23 +384,23 @@ function buildZodPrimitive({
             skipParseJSDoc,
           }),
         ],
-        zodProperties,
+        effectSchemaProperties,
       )
     }
 
     // Deal with `Date`
     if (identifierName === 'Date') {
-      return buildZodSchema(z, 'date', [], zodProperties)
+      return buildEffectSchema(S, 'Date', [], effectSchemaProperties)
     }
 
     // Deal with `Set<>` syntax
     if (identifierName === 'Set' && typeNode.typeArguments) {
-      return buildZodSchema(
-        z,
+      return buildEffectSchema(
+        S,
         'set',
         typeNode.typeArguments.map((i) =>
-          buildZodPrimitive({
-            z,
+          buildEffectSchemaPrimitive({
+            S,
             typeNode: i,
             isOptional: false,
             jsDocTags,
@@ -401,18 +410,18 @@ function buildZodPrimitive({
             skipParseJSDoc,
           }),
         ),
-        zodProperties,
+        effectSchemaProperties,
       )
     }
 
     // Deal with `Promise<>` syntax
     if (identifierName === 'Promise' && typeNode.typeArguments) {
-      return buildZodSchema(
-        z,
+      return buildEffectSchema(
+        S,
         'promise',
         typeNode.typeArguments.map((i) =>
-          buildZodPrimitive({
-            z,
+          buildEffectSchemaPrimitive({
+            S,
             typeNode: i,
             isOptional: false,
             jsDocTags,
@@ -422,7 +431,7 @@ function buildZodPrimitive({
             skipParseJSDoc,
           }),
         ),
-        zodProperties,
+        effectSchemaProperties,
       )
     }
 
@@ -456,7 +465,6 @@ function buildZodPrimitive({
           }),
         )
       }
-
       if (!parameters) {
         throw new Error(
           `${identifierName}<T, K> unknown syntax: (${
@@ -467,8 +475,8 @@ function buildZodPrimitive({
 
       return f.createCallExpression(
         f.createPropertyAccessExpression(
-          buildZodPrimitive({
-            z,
+          buildEffectSchemaPrimitive({
+            S,
             typeNode: originalType,
             isOptional: false,
             jsDocTags: {},
@@ -486,9 +494,9 @@ function buildZodPrimitive({
 
     const dependencyName = getDependencyName(identifierName)
     dependencies.push(dependencyName)
-    const zodSchema: ts.Identifier | ts.CallExpression =
+    const effectSchema: ts.Identifier | ts.CallExpression =
       f.createIdentifier(dependencyName)
-    return withZodProperties(zodSchema, zodProperties)
+    return withEffectSchemaProperties(S, effectSchema, effectSchemaProperties)
   }
 
   if (ts.isUnionTypeNode(typeNode)) {
@@ -503,10 +511,10 @@ function buildZodPrimitive({
     const nodes = typeNode.types.filter(isNotNull)
 
     // type A = | 'b' is a valid typescript definition
-    // Zod does not allow `z.union(['b']), so we have to return just the value
+    // Effect schema does not allow `z.union(['b']), so we have to return just the value
     if (nodes.length === 1) {
-      return buildZodPrimitive({
-        z,
+      return buildEffectSchemaPrimitive({
+        S,
         typeNode: nodes[0],
         isOptional,
         isNullable: hasNull,
@@ -519,8 +527,8 @@ function buildZodPrimitive({
     }
 
     const values = nodes.map((i) =>
-      buildZodPrimitive({
-        z,
+      buildEffectSchemaPrimitive({
+        S,
         typeNode: i,
         isOptional: false,
         isNullable: false,
@@ -534,23 +542,18 @@ function buildZodPrimitive({
 
     // Handling null value outside of the union type
     if (hasNull) {
-      zodProperties.push({
+      effectSchemaProperties.push({
         identifier: 'nullable',
       })
     }
 
-    return buildZodSchema(
-      z,
-      'union',
-      [f.createArrayLiteralExpression(values)],
-      zodProperties,
-    )
+    return buildEffectSchema(S, 'union', values, effectSchemaProperties)
   }
 
   if (ts.isTupleTypeNode(typeNode)) {
     const values = typeNode.elements.map((i) =>
-      buildZodPrimitive({
-        z,
+      buildEffectSchemaPrimitive({
+        S,
         typeNode: ts.isNamedTupleMember(i) ? i.type : i,
         isOptional: false,
         jsDocTags: {},
@@ -560,36 +563,41 @@ function buildZodPrimitive({
         skipParseJSDoc,
       }),
     )
-    return buildZodSchema(
-      z,
-      'tuple',
-      [f.createArrayLiteralExpression(values)],
-      zodProperties,
-    )
+    return buildEffectSchema(S, 'tuple', values, effectSchemaProperties)
   }
 
   if (ts.isLiteralTypeNode(typeNode)) {
     if (ts.isStringLiteral(typeNode.literal)) {
-      return buildZodSchema(
-        z,
+      return buildEffectSchema(
+        S,
         'literal',
         [f.createStringLiteral(typeNode.literal.text)],
-        zodProperties,
+        effectSchemaProperties,
       )
     }
     if (ts.isNumericLiteral(typeNode.literal)) {
-      return buildZodSchema(
-        z,
+      return buildEffectSchema(
+        S,
         'literal',
         [f.createNumericLiteral(typeNode.literal.text)],
-        zodProperties,
+        effectSchemaProperties,
       )
     }
     if (typeNode.literal.kind === ts.SyntaxKind.TrueKeyword) {
-      return buildZodSchema(z, 'literal', [f.createTrue()], zodProperties)
+      return buildEffectSchema(
+        S,
+        'literal',
+        [f.createTrue()],
+        effectSchemaProperties,
+      )
     }
     if (typeNode.literal.kind === ts.SyntaxKind.FalseKeyword) {
-      return buildZodSchema(z, 'literal', [f.createFalse()], zodProperties)
+      return buildEffectSchema(
+        S,
+        'literal',
+        [f.createFalse()],
+        effectSchemaProperties,
+      )
     }
   }
 
@@ -599,8 +607,8 @@ function buildZodPrimitive({
     ts.isQualifiedName(typeNode.typeName) &&
     ts.isIdentifier(typeNode.typeName.left)
   ) {
-    return buildZodSchema(
-      z,
+    return buildEffectSchema(
+      S,
       'literal',
       [
         f.createPropertyAccessExpression(
@@ -608,17 +616,17 @@ function buildZodPrimitive({
           typeNode.typeName.right,
         ),
       ],
-      zodProperties,
+      effectSchemaProperties,
     )
   }
 
   if (ts.isArrayTypeNode(typeNode)) {
-    return buildZodSchema(
-      z,
+    return buildEffectSchema(
+      S,
       'array',
       [
-        buildZodPrimitive({
-          z,
+        buildEffectSchemaPrimitive({
+          S,
           typeNode: typeNode.elementType,
           isOptional: false,
           jsDocTags: {},
@@ -628,28 +636,29 @@ function buildZodPrimitive({
           skipParseJSDoc,
         }),
       ],
-      zodProperties,
+      effectSchemaProperties,
     )
   }
 
   if (ts.isTypeLiteralNode(typeNode)) {
-    return withZodProperties(
-      buildZodObject({
+    return withEffectSchemaProperties(
+      S,
+      buildEffectSchemaObject({
         typeNode,
-        z,
+        S,
         sourceFile,
         dependencies,
         getDependencyName,
         skipParseJSDoc,
       }),
-      zodProperties,
+      effectSchemaProperties,
     )
   }
 
   if (ts.isIntersectionTypeNode(typeNode)) {
     const [base, ...rest] = typeNode.types
-    const basePrimitive = buildZodPrimitive({
-      z,
+    const basePrimitive = buildEffectSchemaPrimitive({
+      S,
       typeNode: base,
       isOptional: false,
       jsDocTags: {},
@@ -661,15 +670,11 @@ function buildZodPrimitive({
 
     return rest.reduce(
       (intersectionSchema, node) =>
-        f.createCallExpression(
-          f.createPropertyAccessExpression(
-            intersectionSchema,
-            f.createIdentifier('and'),
-          ),
-          undefined,
-          [
-            buildZodPrimitive({
-              z,
+        callPipe(undefined, [
+          intersectionSchema,
+          callCreateCallExpression(S, 'extend', undefined, [
+            buildEffectSchemaPrimitive({
+              S,
               typeNode: node,
               isOptional: false,
               jsDocTags: {},
@@ -678,32 +683,32 @@ function buildZodPrimitive({
               getDependencyName,
               skipParseJSDoc,
             }),
-          ],
-        ),
+          ]),
+        ]),
       basePrimitive,
     )
   }
 
   if (ts.isLiteralTypeNode(typeNode)) {
-    return buildZodSchema(
-      z,
+    return buildEffectSchema(
+      S,
       typeNode.literal.getText(sourceFile),
       [],
-      zodProperties,
+      effectSchemaProperties,
     )
   }
 
   if (ts.isFunctionTypeNode(typeNode)) {
-    return buildZodSchema(
-      z,
+    return buildEffectSchema(
+      S,
       'function',
       [],
       [
         {
           identifier: 'args',
           expressions: typeNode.parameters.map((p) =>
-            buildZodPrimitive({
-              z,
+            buildEffectSchemaPrimitive({
+              S,
               typeNode:
                 p.type || f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
               jsDocTags,
@@ -718,8 +723,8 @@ function buildZodPrimitive({
         {
           identifier: 'returns',
           expressions: [
-            buildZodPrimitive({
-              z,
+            buildEffectSchemaPrimitive({
+              S,
               typeNode: typeNode.type,
               jsDocTags,
               sourceFile,
@@ -730,7 +735,7 @@ function buildZodPrimitive({
             }),
           ],
         },
-        ...zodProperties,
+        ...effectSchemaProperties,
       ],
     )
   }
@@ -746,23 +751,23 @@ function buildZodPrimitive({
 
   switch (typeNode.kind) {
     case ts.SyntaxKind.StringKeyword:
-      return buildZodSchema(z, 'string', [], zodProperties)
+      return buildEffectSchema(S, 'string', [], effectSchemaProperties)
     case ts.SyntaxKind.BooleanKeyword:
-      return buildZodSchema(z, 'boolean', [], zodProperties)
+      return buildEffectSchema(S, 'boolean', [], effectSchemaProperties)
     case ts.SyntaxKind.UndefinedKeyword:
-      return buildZodSchema(z, 'undefined', [], zodProperties)
+      return buildEffectSchema(S, 'undefined', [], effectSchemaProperties)
     case ts.SyntaxKind.NumberKeyword:
-      return buildZodSchema(z, 'number', [], zodProperties)
+      return buildEffectSchema(S, 'number', [], effectSchemaProperties)
     case ts.SyntaxKind.AnyKeyword:
-      return buildZodSchema(z, 'any', [], zodProperties)
+      return buildEffectSchema(S, 'any', [], effectSchemaProperties)
     case ts.SyntaxKind.BigIntKeyword:
-      return buildZodSchema(z, 'bigint', [], zodProperties)
+      return buildEffectSchema(S, 'bigint', [], effectSchemaProperties)
     case ts.SyntaxKind.VoidKeyword:
-      return buildZodSchema(z, 'void', [], zodProperties)
+      return buildEffectSchema(S, 'void', [], effectSchemaProperties)
     case ts.SyntaxKind.NeverKeyword:
-      return buildZodSchema(z, 'never', [], zodProperties)
+      return buildEffectSchema(S, 'never', [], effectSchemaProperties)
     case ts.SyntaxKind.UnknownKeyword:
-      return buildZodSchema(z, 'unknown', [], zodProperties)
+      return buildEffectSchema(S, 'unknown', [], effectSchemaProperties)
   }
 
   console.warn(
@@ -770,95 +775,136 @@ function buildZodPrimitive({
       ts.SyntaxKind[typeNode.kind]
     }' is not supported, fallback into 'z.any()'`,
   )
-  return buildZodSchema(z, 'any', [], zodProperties)
+  return buildEffectSchema(S, 'any', [], effectSchemaProperties)
 }
 
 /**
- * Build a zod schema.
+ * Build a effect schema.
  *
- * @param z zod namespace
- * @param callName zod function
- * @param args Args to add to the main zod call, if any
+ * @param S effect schema namespace
+ * @param callName effect schema function
+ * @param args Args to add to the main effect schema call, if any
  * @param properties An array of flags that should be added as extra property calls such as optional to add .optional()
  */
-function buildZodSchema(
-  z: string,
+function buildEffectSchema(
+  S: string,
   callName: string,
   args?: ts.Expression[],
-  properties?: ZodProperty[],
+  properties?: EffectSchemaProperty[],
 ) {
-  const zodCall = f.createCallExpression(
-    f.createPropertyAccessExpression(
-      f.createIdentifier(z),
-      f.createIdentifier(callName),
-    ),
-    undefined,
-    args,
+  const expression = f.createPropertyAccessExpression(
+    f.createIdentifier(S),
+    f.createIdentifier(callName),
   )
-  return withZodProperties(zodCall, properties)
+
+  const effect = primitivePropertyList.includes(
+    expression.name.escapedText as string,
+  )
+    ? expression
+    : f.createCallExpression(expression, undefined, args)
+  return withEffectSchemaProperties(S, effect, properties)
 }
 
-function buildZodExtendedSchema(
+function buildEffectSchemaExtendedSchema(
+  S: string,
   schemaList: string[],
   args?: ts.Expression[],
-  properties?: ZodProperty[],
+  properties?: EffectSchemaProperty[],
 ) {
-  let zodCall = f.createIdentifier(schemaList[0]) as ts.Expression
+  let effectSchemaCall = f.createIdentifier(schemaList[0]) as ts.Expression
 
   for (let i = 1; i < schemaList.length; i++) {
-    zodCall = f.createCallExpression(
-      f.createPropertyAccessExpression(zodCall, f.createIdentifier('extend')),
+    effectSchemaCall = f.createCallExpression(
+      f.createPropertyAccessExpression(
+        effectSchemaCall,
+        f.createIdentifier('extend'),
+      ),
       undefined,
       [
-        f.createPropertyAccessExpression(
+        callCreateCallExpression(S, 'getPropertySignatures', undefined, [
           f.createIdentifier(schemaList[i]),
-          f.createIdentifier('shape'),
-        ),
+        ]),
       ],
     )
   }
 
   if (args?.length) {
-    zodCall = f.createCallExpression(
-      f.createPropertyAccessExpression(zodCall, f.createIdentifier('extend')),
+    effectSchemaCall = f.createCallExpression(
+      f.createPropertyAccessExpression(
+        effectSchemaCall,
+        f.createIdentifier('extend'),
+      ),
       undefined,
       args,
     )
   }
 
-  return withZodProperties(zodCall, properties)
+  return withEffectSchemaProperties(S, effectSchemaCall, properties)
 }
 
 /**
- * Apply zod properties to an expression (as `.optional()`)
+ * Apply effect schema properties to an expression (as `.optional()`)
  *
  * @param expression
  * @param properties
  */
-function withZodProperties(
+function withEffectSchemaProperties(
+  s: string,
   expression: ts.Expression,
-  properties: ZodProperty[] = [],
+  properties: EffectSchemaProperty[] = [],
 ) {
-  return properties.reduce(
-    (expressionWithProperties, property) =>
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          expressionWithProperties,
-          f.createIdentifier(property.identifier),
-        ),
-        undefined,
-        property.expressions ? property.expressions : undefined,
-      ),
-    expression,
-  ) as ts.CallExpression
+  return properties.reduce((expressionWithProperties, property) => {
+    if (property.identifier === 'optional.withDefault') {
+      const isOptional =
+        (
+          expressionWithProperties as unknown as {
+            expression: ts.PropertyAccessExpression
+          }
+        )?.expression?.name?.escapedText === 'optional'
+      const optionalExpression = isOptional
+        ? expressionWithProperties
+        : callCreateCallExpression(s, 'optional', undefined, [
+            expressionWithProperties,
+          ])
+
+      return callCreatePropertyAccessExpression(
+        optionalExpression,
+        (property.expressions as unknown as [ts.MemberName])[0],
+      )
+    }
+
+    const e = callCreateCallExpression(
+      s,
+      property.identifier,
+      undefined,
+      property.expressions ? property.expressions : [expressionWithProperties],
+    )
+
+    const ex = expressionWithProperties as unknown as {
+      expression: ts.Identifier
+      arguments: ts.Expression[]
+    }
+
+    if (property.expressions) {
+      // Reduce unnecessary "pipe"
+      return ex.expression.escapedText === 'pipe'
+        ? {
+            ...expressionWithProperties,
+            arguments: [...ex.arguments, e],
+          }
+        : callPipe(undefined, [expressionWithProperties, e])
+    }
+
+    return e
+  }, expression) as ts.CallExpression
 }
 
 /**
  * Build z.object (with support of index signature)
  */
-function buildZodObject({
+function buildEffectSchemaObject({
   typeNode,
-  z,
+  S,
   dependencies,
   sourceFile,
   getDependencyName,
@@ -866,10 +912,10 @@ function buildZodObject({
   skipParseJSDoc,
 }: {
   typeNode: ts.TypeLiteralNode | ts.InterfaceDeclaration
-  z: string
+  S: string
   dependencies: string[]
   sourceFile: ts.SourceFile
-  getDependencyName: Required<GenerateZodSchemaProps>['getDependencyName']
+  getDependencyName: Required<GenerateEffectSchemaProps>['getDependencyName']
   schemaExtensionClauses?: string[]
   skipParseJSDoc: boolean
 }) {
@@ -899,9 +945,9 @@ function buildZodObject({
 
   const parsedProperties =
     properties.length > 0
-      ? buildZodProperties({
+      ? buildEffectSchemaProperties({
           members: properties,
-          zodImportValue: z,
+          schemaImportValue: S,
           sourceFile,
           dependencies,
           getDependencyName,
@@ -910,7 +956,8 @@ function buildZodObject({
       : new Map()
 
   if (schemaExtensionClauses && schemaExtensionClauses.length > 0) {
-    objectSchema = buildZodExtendedSchema(
+    objectSchema = buildEffectSchemaExtendedSchema(
+      S,
       schemaExtensionClauses,
       properties.length > 0
         ? [
@@ -924,7 +971,7 @@ function buildZodObject({
         : undefined,
     )
   } else if (properties.length > 0) {
-    objectSchema = buildZodSchema(z, 'object', [
+    objectSchema = buildEffectSchema(S, 'struct', [
       f.createObjectLiteralExpression(
         Array.from(parsedProperties.entries()).map(([key, tsCall]) => {
           return f.createPropertyAssignment(key, tsCall)
@@ -933,17 +980,20 @@ function buildZodObject({
       ),
     ])
   }
-
   if (indexSignature) {
     if (schemaExtensionClauses) {
       throw new Error(
         'interface with `extends` and index signature are not supported!',
       )
     }
-    const indexSignatureSchema = buildZodSchema(z, 'record', [
+    const indexSignatureSchema = buildEffectSchema(S, 'record', [
+      f.createPropertyAccessExpression(
+        f.createIdentifier(S),
+        f.createIdentifier('string'),
+      ),
       // Index signature type can't be optional or have validators.
-      buildZodPrimitive({
-        z,
+      buildEffectSchemaPrimitive({
+        S,
         typeNode: indexSignature.type,
         isOptional: false,
         jsDocTags: {},
@@ -968,7 +1018,7 @@ function buildZodObject({
   } else if (objectSchema) {
     return objectSchema
   }
-  return buildZodSchema(z, 'object', [f.createObjectLiteralExpression()])
+  return buildEffectSchema(S, 'struct', [f.createObjectLiteralExpression()])
 }
 
 /**
@@ -986,7 +1036,7 @@ function buildSchemaReference(
     node: ts.IndexedAccessTypeNode
     dependencies: string[]
     sourceFile: ts.SourceFile
-    getDependencyName: Required<GenerateZodSchemaProps>['getDependencyName']
+    getDependencyName: Required<GenerateEffectSchemaProps>['getDependencyName']
   },
   path = '',
 ): ts.PropertyAccessExpression | ts.Identifier {
@@ -1061,7 +1111,7 @@ function buildSchemaReference(
               sourceFile,
               getDependencyName,
             },
-            `valueSchema.${path}`,
+            `${path}`,
           )
         }
 
@@ -1079,14 +1129,14 @@ function buildSchemaReference(
   ) {
     return buildSchemaReference(
       { node: node.objectType, dependencies, sourceFile, getDependencyName },
-      `items[${indexTypeName}].${path}`,
+      `[${indexTypeName}].${path}`,
     )
   }
 
   if (ts.isIndexedAccessTypeNode(node.objectType)) {
     return buildSchemaReference(
       { node: node.objectType, dependencies, sourceFile, getDependencyName },
-      `shape.${indexTypeName}.${path}`,
+      `${indexTypeName}.${path}`,
     )
   }
 
@@ -1095,10 +1145,22 @@ function buildSchemaReference(
       node.objectType.typeName.getText(sourceFile),
     )
     dependencies.push(dependencyName)
-    return f.createPropertyAccessExpression(
-      f.createIdentifier(dependencyName),
-      f.createIdentifier(`shape.${indexTypeName}.${path}`.slice(0, -1)),
+
+    const e = f.createPropertyAccessExpression(
+      callCreateCallExpression('S', 'getPropertySignatures', undefined, [
+        f.createIdentifier(dependencyName),
+      ]),
+      f.createIdentifier(indexTypeName),
     )
+
+    return path
+      ? f.createPropertyAccessExpression(
+          callCreateCallExpression('S', 'getPropertySignatures', undefined, [
+            e,
+          ]),
+          f.createIdentifier(path.slice(0, -1)),
+        )
+      : e
   }
 
   throw new Error('Unknown IndexedAccessTypeNode.objectType type')

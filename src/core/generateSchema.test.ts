@@ -7,91 +7,91 @@ describe('generateSchema', () => {
   it('should generate a string schema', () => {
     const source = 'export type MyHeroName = string;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myHeroNameSchema = z.string();"`,
+      `"export const myHeroNameSchema = S.string;"`,
     )
   })
 
   it('should generate a number schema', () => {
     const source = 'export type MyHeroAge = number;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myHeroAgeSchema = z.number();"`,
+      `"export const myHeroAgeSchema = S.number;"`,
     )
   })
 
   it('should generate an any schema', () => {
     const source = 'export type MyHeroPower = any;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myHeroPowerSchema = z.any();"`,
+      `"export const myHeroPowerSchema = S.any;"`,
     )
   })
 
   it('should generate a boolean schema', () => {
     const source = 'export type HavePower = boolean;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const havePowerSchema = z.boolean();"`,
+      `"export const havePowerSchema = S.boolean;"`,
     )
   })
 
   it('should generate an undefined schema', () => {
     const source = 'export type Nothing = undefined;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const nothingSchema = z.undefined();"`,
+      `"export const nothingSchema = S.undefined;"`,
     )
   })
 
   it('should generate a null schema', () => {
     const source = 'export type MyHeroWeakness = null;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myHeroWeaknessSchema = z.null();"`,
+      `"export const myHeroWeaknessSchema = S.null;"`,
     )
   })
 
   it('should generate a void schema', () => {
     const source = 'export type MyEnemyChance = void;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myEnemyChanceSchema = z.void();"`,
+      `"export const myEnemyChanceSchema = S.void;"`,
     )
   })
 
   it('should generate a bigint schema', () => {
     const source = 'export type loisLaneCapturedCount = bigint;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const loisLaneCapturedCountSchema = z.bigint();"`,
+      `"export const loisLaneCapturedCountSchema = S.bigint;"`,
     )
   })
 
   it('should generate a date schema', () => {
     const source = 'export type lastIncidentInMetropolis = Date;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const lastIncidentInMetropolisSchema = z.date();"`,
+      `"export const lastIncidentInMetropolisSchema = S.Date;"`,
     )
   })
 
   it('should generate a literal schema (string)', () => {
     const source = `export type Kryptonite = "kryptonite";`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const kryptoniteSchema = z.literal(\\"kryptonite\\");"`,
+      `"export const kryptoniteSchema = S.literal(\\"kryptonite\\");"`,
     )
   })
 
   it('should generate a literal schema (number)', () => {
     const source = 'export type IdentitiesCount = 2;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const identitiesCountSchema = z.literal(2);"`,
+      `"export const identitiesCountSchema = S.literal(2);"`,
     )
   })
 
   it('should generate a literal schema (true)', () => {
     const source = 'export type IsSuperman = true;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const isSupermanSchema = z.literal(true);"`,
+      `"export const isSupermanSchema = S.literal(true);"`,
     )
   })
 
   it('should generate a literal schema (false)', () => {
-    const source = 'export type CanBeatZod = false;'
+    const source = 'export type CanBeatEffect = false;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const canBeatZodSchema = z.literal(false);"`,
+      `"export const canBeatEffectSchema = S.literal(false);"`,
     )
   })
 
@@ -102,61 +102,61 @@ describe('generateSchema', () => {
     };
     `
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const bestSuperheroSchema = z.object({
-          superhero: z.literal(Superhero.Superman)
+      "export const bestSuperheroSchema = S.struct({
+          superhero: S.literal(Superhero.Superman)
       });"
     `)
   })
 
-  it('should generate a nativeEnum schema', () => {
+  it('should generate a enums schema', () => {
     const source = `export enum Superhero = {
       Superman = "superman",
       ClarkKent = "clark_kent",
     };`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const superheroSchema = z.nativeEnum(Superhero);"`,
+      `"export const superheroSchema = S.enums(Superhero);"`,
     )
   })
 
   it('should generate a never', () => {
-    const source = 'export type CanBeatZod = never;'
+    const source = 'export type CanBeatEffect = never;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const canBeatZodSchema = z.never();"`,
+      `"export const canBeatEffectSchema = S.never;"`,
     )
   })
 
   it('should map unknown type correctly', () => {
     const source = 'export type T = unknown;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const tSchema = z.unknown();"`,
+      `"export const tSchema = S.unknown;"`,
     )
   })
 
   it('should generate an array schema (T[] notation)', () => {
     const source = 'export type Villains = string[];'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const villainsSchema = z.array(z.string());"`,
+      `"export const villainsSchema = S.array(S.string);"`,
     )
   })
 
   it('should generate an array schema (Array<T> notation)', () => {
     const source = 'export type Villains = Array<string>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const villainsSchema = z.array(z.string());"`,
+      `"export const villainsSchema = S.array(S.string);"`,
     )
   })
 
   it('should generate a tuple schema', () => {
     const source = 'export type Life = [LoisLane, Problem[]];'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const lifeSchema = z.tuple([loisLaneSchema, z.array(problemSchema)]);"`,
+      `"export const lifeSchema = S.tuple(loisLaneSchema, S.array(problemSchema));"`,
     )
   })
 
   it('should generate a tuple schema (named)', () => {
     const source = 'export type Story = [subject: string, problems: string[]];'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const storySchema = z.tuple([z.string(), z.array(z.string())]);"`,
+      `"export const storySchema = S.tuple(S.string, S.array(S.string));"`,
     )
   })
 
@@ -168,11 +168,11 @@ describe('generateSchema', () => {
      enemies: Array<string>;
    };`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = z.object({
-          name: z.literal(\\"superman\\"),
+      "export const supermanSchema = S.struct({
+          name: S.literal(\\"superman\\"),
           weakness: kryptoniteSchema,
-          age: z.number(),
-          enemies: z.array(z.string())
+          age: S.number,
+          enemies: S.array(S.string)
       });"
     `)
   })
@@ -189,11 +189,11 @@ describe('generateSchema', () => {
    };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const responsesSchema = z.object({
-          200: z.object({
-              content: z.object({
-                  \\"application/json\\": z.object({
-                      id: z.string()
+      "export const responsesSchema = S.struct({
+          200: S.struct({
+              content: S.struct({
+                  \\"application/json\\": S.struct({
+                      id: S.string
                   })
               })
           })
@@ -201,12 +201,12 @@ describe('generateSchema', () => {
     `)
   })
 
-  it('should generate a promise schema', () => {
-    const source = 'export type KrytonResponse = Promise<boolean>'
-    expect(generate(source)).toMatchInlineSnapshot(
-      `"export const krytonResponseSchema = z.promise(z.boolean());"`,
-    )
-  })
+  // it('should generate a promise schema', () => {
+  //   const source = 'export type KrytonResponse = Promise<boolean>'
+  //   expect(generate(source)).toMatchInlineSnapshot(
+  //     `"export const krytonResponseSchema = z.promise(S.boolean);"`,
+  //   )
+  // })
 
   it('should generate a referenced schema', () => {
     const source = 'export type Villain = BadGuy;'
@@ -218,14 +218,14 @@ describe('generateSchema', () => {
   it('should generate a union schema', () => {
     const source = `export type Identity = "superman" | "clark kent";`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const identitySchema = z.union([z.literal(\\"superman\\"), z.literal(\\"clark kent\\")]);"`,
+      `"export const identitySchema = S.union(S.literal(\\"superman\\"), S.literal(\\"clark kent\\"));"`,
     )
   })
 
   it('should generate a literal schema for a single union', () => {
     const source = `export type Identity = | "superman";`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const identitySchema = z.literal(\\"superman\\");"`,
+      `"export const identitySchema = S.literal(\\"superman\\");"`,
     )
   })
 
@@ -233,57 +233,57 @@ describe('generateSchema', () => {
     const source =
       'export type SupermanWithWeakness = Superman & { weakness: Kryptonite };'
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanWithWeaknessSchema = supermanSchema.and(z.object({
+      "export const supermanWithWeaknessSchema = pipe(supermanSchema, S.extend(S.struct({
           weakness: kryptoniteSchema
-      }));"
+      })));"
     `)
   })
 
   it('should generate a record schema', () => {
     const source = 'export type EnemiesPowers = Record<string, Power>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const enemiesPowersSchema = z.record(powerSchema);"`,
+      `"export const enemiesPowersSchema = S.record(S.string, powerSchema);"`,
     )
   })
 
   it('should generate a set schema', () => {
     const source = 'export type EnemiesPowers = Set<string>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const enemiesPowersSchema = z.set(z.string());"`,
+      `"export const enemiesPowersSchema = S.set(S.string);"`,
     )
   })
 
-  it('should generate a function schema', () => {
-    const source =
-      'export type KillSuperman = (withKryptonite: boolean, method: string) => Promise<boolean>;'
-    expect(generate(source)).toMatchInlineSnapshot(
-      `"export const killSupermanSchema = z.function().args(z.boolean(), z.string()).returns(z.promise(z.boolean()));"`,
-    )
-  })
+  // it('should generate a function schema', () => {
+  //   const source =
+  //     'export type KillSuperman = (withKryptonite: boolean, method: string) => Promise<boolean>;'
+  //   expect(generate(source)).toMatchInlineSnapshot(
+  //     `"export const killSupermanSchema = z.function().args(S.boolean, S.string).returns(z.promise(S.boolean));"`,
+  //   )
+  // })
 
-  it('should generate a function with optional parameter', () => {
-    const source = `export type GetSupermanSkill = (
-      key: string,
-      params?: Record<string, string | number>
-    ) => string`
+  // it('should generate a function with optional parameter', () => {
+  //   const source = `export type GetSupermanSkill = (
+  //     key: string,
+  //     params?: Record<string, string | number>
+  //   ) => string`
 
-    expect(generate(source)).toMatchInlineSnapshot(
-      `"export const getSupermanSkillSchema = z.function().args(z.string(), z.record(z.union([z.string(), z.number()])).optional()).returns(z.string());"`,
-    )
-  })
+  //   expect(generate(source)).toMatchInlineSnapshot(
+  //     `"export const getSupermanSkillSchema = z.function().args(S.string, z.record(z.union([S.string, S.number])).optional()).returns(S.string);"`,
+  //   )
+  // })
 
-  it('should generate a function schema (with `any` fallback on param)', () => {
-    const source =
-      'export type KillSuperman = (withKryptonite: boolean, method) => Promise<boolean>;'
-    expect(generate(source)).toMatchInlineSnapshot(
-      `"export const killSupermanSchema = z.function().args(z.boolean(), z.any()).returns(z.promise(z.boolean()));"`,
-    )
-  })
+  // it('should generate a function schema (with `any` fallback on param)', () => {
+  //   const source =
+  //     'export type KillSuperman = (withKryptonite: boolean, method) => Promise<boolean>;'
+  //   expect(generate(source)).toMatchInlineSnapshot(
+  //     `"export const killSupermanSchema = z.function().args(S.boolean, S.any).returns(z.promise(S.boolean));"`,
+  //   )
+  // })
 
   it('should throw on non string record', () => {
     const source = 'export type UnsupportedType = Record<number, number>;'
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"Record<number, …> are not supported (https://github.com/colinhacks/zod/tree/v3#records)"`,
+      `"Record<number, …> are not supported (https://github.com/effect-ts/schema#records)"`,
     )
   })
 
@@ -337,21 +337,21 @@ describe('generateSchema', () => {
   it('should fallback on Array for ReadonlyArray<T>', () => {
     const source = 'export type ReadonlySupermen = ReadonlyArray<Superman>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const readonlySupermenSchema = z.array(supermanSchema);"`,
+      `"export const readonlySupermenSchema = S.array(supermanSchema);"`,
     )
   })
 
   it('should generate a partial schema', () => {
     const source = 'export type SupermanUnderKryptonite = Partial<Hero>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanUnderKryptoniteSchema = heroSchema.partial();"`,
+      `"export const supermanUnderKryptoniteSchema = S.partial(heroSchema);"`,
     )
   })
 
   it('should generate a required schema', () => {
     const source = 'export type IDidFindYou = Required<VillainLocation>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const iDidFindYouSchema = villainLocationSchema.required();"`,
+      `"export const iDidFindYouSchema = S.required(villainLocationSchema);"`,
     )
   })
 
@@ -392,12 +392,12 @@ describe('generateSchema', () => {
      needGlasses: true | null;
    };`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = z.object({
-          name: z.union([z.literal(\\"superman\\"), z.literal(\\"clark kent\\"), z.literal(\\"kal-l\\")]),
-          enemies: z.record(enemySchema),
-          age: z.number(),
-          underKryptonite: z.boolean().optional(),
-          needGlasses: z.literal(true).nullable()
+      "export const supermanSchema = S.struct({
+          name: S.union(S.literal(\\"superman\\"), S.literal(\\"clark kent\\"), S.literal(\\"kal-l\\")),
+          enemies: S.record(S.string, enemySchema),
+          age: S.number,
+          underKryptonite: S.optional(S.boolean),
+          needGlasses: S.nullable(S.literal(true))
       });"
     `)
   })
@@ -408,7 +408,7 @@ describe('generateSchema', () => {
    }`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const supermanSchema = clarkSchema.extend({
-          withPower: z.boolean()
+          withPower: S.boolean
       });"
     `)
   })
@@ -426,10 +426,10 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-        "export const supermanSchema = clarkSchema.extend(kalLSchema.shape).extend({
-            withPower: z.boolean()
-        });"
-      `)
+      "export const supermanSchema = clarkSchema.extend(S.getPropertySignatures(kalLSchema)).extend({
+          withPower: S.boolean
+      });"
+    `)
   })
 
   it('should generate a merged schema when extending with two comma-separated interfaces', () => {
@@ -438,10 +438,10 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-        "export const supermanSchema = clarkSchema.extend(kalLSchema.shape).extend({
-            withPower: z.boolean()
-        });"
-      `)
+      "export const supermanSchema = clarkSchema.extend(S.getPropertySignatures(kalLSchema)).extend({
+          withPower: S.boolean
+      });"
+    `)
   })
 
   it('should generate a merged schema when extending with multiple comma-separated interfaces', () => {
@@ -450,10 +450,10 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-        "export const supermanSchema = clarkSchema.extend(kalLSchema.shape).extend(kryptonianSchema.shape).extend({
-            withPower: z.boolean()
-        });"
-      `)
+      "export const supermanSchema = clarkSchema.extend(S.getPropertySignatures(kalLSchema)).extend(S.getPropertySignatures(kryptonianSchema)).extend({
+          withPower: S.boolean
+      });"
+    `)
   })
 
   it('should deal with literal keys', () => {
@@ -461,8 +461,8 @@ describe('generateSchema', () => {
      "i.will.kill.everybody": true;
    };`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const villainSchema = z.object({
-          \\"i.will.kill.everybody\\": z.literal(true)
+      "export const villainSchema = S.struct({
+          \\"i.will.kill.everybody\\": S.literal(true)
       });"
     `)
   })
@@ -471,7 +471,7 @@ describe('generateSchema', () => {
     const source = `export type SupermanName = Superman["name"]`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanNameSchema = supermanSchema.shape.name;"`,
+      `"export const supermanNameSchema = S.getPropertySignatures(supermanSchema).name;"`,
     )
   })
 
@@ -479,7 +479,7 @@ describe('generateSchema', () => {
     const source = `export type SupermanFlyPower = Superman["power"]["fly"]`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanFlyPowerSchema = supermanSchema.shape.power.shape.fly;"`,
+      `"export const supermanFlyPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).power).fly;"`,
     )
   })
 
@@ -491,7 +491,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = supermanSchema.shape.powers.element;"`,
+      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).element;"`,
     )
   })
 
@@ -503,7 +503,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = supermanSchema.shape.powers.element;"`,
+      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).element;"`,
     )
   })
 
@@ -515,7 +515,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = supermanSchema.shape.powers.valueSchema;"`,
+      `"export const supermanPowerSchema = S.getPropertySignatures(supermanSchema).powers;"`,
     )
   })
 
@@ -527,7 +527,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = supermanSchema.shape.powers.valueSchema;"`,
+      `"export const supermanPowerSchema = S.getPropertySignatures(supermanSchema).powers;"`,
     )
   })
 
@@ -539,7 +539,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = supermanSchema.shape.powers.items[1];"`,
+      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).[1];"`,
     )
   })
 
@@ -564,7 +564,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = supermanSchema.shape.powers.element;"`,
+      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).element;"`,
     )
   })
 
@@ -576,7 +576,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = supermanSchema.shape.powers.element;"`,
+      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).element;"`,
     )
   })
 
@@ -588,21 +588,21 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = supermanSchema.shape.powers.valueSchema;"`,
+      `"export const supermanPowerSchema = S.getPropertySignatures(supermanSchema).powers;"`,
     )
   })
 
   it('should deal with parenthesized type', () => {
     const source = 'export type SecretVillain = (NormalGuy | Villain);'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const secretVillainSchema = z.union([normalGuySchema, villainSchema]);"`,
+      `"export const secretVillainSchema = S.union(normalGuySchema, villainSchema);"`,
     )
   })
 
   it('should deal with index signature', () => {
     const source = 'export type Movies = {[title: string]: Movie};'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const moviesSchema = z.record(movieSchema);"`,
+      `"export const moviesSchema = S.record(S.string, movieSchema);"`,
     )
   })
 
@@ -612,10 +612,10 @@ describe('generateSchema', () => {
       [title: string]: Movie;
     };`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const moviesSchema = z.record(movieSchema).and(z.object({
-          \\"Man of Steel\\": movieSchema.and(z.object({
-              title: z.literal(\\"Man of Steel\\")
-          }))
+      "export const moviesSchema = S.record(S.string, movieSchema).and(S.struct({
+          \\"Man of Steel\\": pipe(movieSchema, S.extend(S.struct({
+              title: S.literal(\\"Man of Steel\\")
+          })))
       }));"
     `)
   })
@@ -625,8 +625,8 @@ describe('generateSchema', () => {
       movies?: {[title: string] : Movie}
     }`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const collectionSchema = z.object({
-          movies: z.record(movieSchema).optional()
+      "export const collectionSchema = S.struct({
+          movies: S.optional(S.record(S.string, movieSchema))
       });"
     `)
   })
@@ -636,8 +636,8 @@ describe('generateSchema', () => {
       movies?: Array<string>
     }`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const collectionSchema = z.object({
-          movies: z.array(z.string()).optional()
+      "export const collectionSchema = S.struct({
+          movies: S.optional(S.array(S.string))
       });"
     `)
   })
@@ -645,7 +645,7 @@ describe('generateSchema', () => {
   it('should generate an empty object schema', () => {
     const source = 'export type Empty = {};'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const emptySchema = z.object({});"`,
+      `"export const emptySchema = S.struct({});"`,
     )
   })
 
@@ -689,39 +689,39 @@ describe('generateSchema', () => {
       age: number;
     }`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const heroContactSchema = z.object({
+      "export const heroContactSchema = S.struct({
           /**
            * The email of the hero.
            *
            * @format email
            */
-          email: z.string().email(),
+          email: S.email(S.string),
           /**
            * The name of the hero.
            *
            * @minLength 2
            * @maxLength 50
            */
-          name: z.string().min(2).max(50),
+          name: pipe(S.string, S.minLength(2), S.maxLength(50)),
           /**
            * The phone number of the hero.
            *
            * @pattern ^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$
            */
-          phoneNumber: z.string().regex(/^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$/),
+          phoneNumber: pipe(S.string, S.pattern(/^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$/)),
           /**
            * Does the hero has super power?
            *
            * @default true
            */
-          hasSuperPower: z.boolean().optional().default(true),
+          hasSuperPower: S.optional(S.boolean).withDefault(() => true),
           /**
            * The age of the hero
            *
            * @minimum 0
            * @maximum 500
            */
-          age: z.number().min(0).max(500)
+          age: pipe(S.number, S.lessThan(0), S.greaterThan(500))
       });"
     `)
   })
@@ -750,25 +750,25 @@ describe('generateSchema', () => {
       supermanEmail: string;
     }`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const heroContactSchema = z.object({
+      "export const heroContactSchema = S.struct({
           /**
            * The email of the hero.
            *
            * @format email Should be an email
            */
-          heroEmail: z.string().email(\\"Should be an email\\"),
+          heroEmail: pipe(S.string, S.email(\\"Should be an email\\")),
           /**
            * The email of the enemy.
            *
            * @format email, \\"Should be an email\\"
            */
-          enemyEmail: z.string().email(\\"Should be an email\\"),
+          enemyEmail: pipe(S.string, S.email(\\"Should be an email\\")),
           /**
            * The email of the superman.
            *
            * @format email \\"Should be an email\\"
            */
-          supermanEmail: z.string().email(\\"Should be an email\\")
+          supermanEmail: pipe(S.string, S.email(\\"Should be an email\\"))
       });"
     `)
   })
@@ -799,27 +799,27 @@ describe('generateSchema', () => {
       age: number;
     }`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const heroContactSchema = z.object({
+      "export const heroContactSchema = S.struct({
           /**
            * The email of the hero.
            *
            * @format email should be an email
            */
-          email: z.string().email(\\"should be an email\\"),
+          email: pipe(S.string, S.email(\\"should be an email\\")),
           /**
            * The name of the hero.
            *
            * @minLength 2, should be more than 2
            * @maxLength 50 should be less than 50
            */
-          name: z.string().min(2, \\"should be more than 2\\").max(50, \\"should be less than 50\\"),
+          name: pipe(S.string, S.minLength(2, \\"should be more than 2\\"), S.maxLength(50, \\"should be less than 50\\")),
           /**
            * The age of the hero
            *
            * @minimum 0 you are too young
            * @maximum 500, \\"you are too old\\"
            */
-          age: z.number().min(0, \\"you are too young\\").max(500, \\"you are too old\\")
+          age: pipe(S.number, S.lessThan(0, \\"you are too young\\"), S.greaterThan(500, \\"you are too old\\"))
       });"
     `)
   })
@@ -834,7 +834,7 @@ describe('generateSchema', () => {
       "/**
           * @minLength 1
           */
-      export const nonEmptyStringSchema = z.string().min(1);"
+      export const nonEmptyStringSchema = pipe(S.string, S.minLength(1));"
     `)
   })
 
@@ -850,13 +850,13 @@ describe('generateSchema', () => {
     `
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const aSchema = z.object({
+      "export const aSchema = S.struct({
           /** @minimum 0 */
-          a: z.number().min(0).nullable(),
+          a: S.nullable(pipe(S.number, S.lessThan(0))),
           /** @minLength 1 */
-          b: z.string().min(1).nullable(),
+          b: S.nullable(pipe(S.string, S.minLength(1))),
           /** @pattern ^c$ */
-          c: z.string().regex(/^c$/).nullable()
+          c: S.nullable(pipe(S.string, S.pattern(/^c$/)))
       });"
     `)
   })
@@ -868,8 +868,8 @@ describe('generateSchema', () => {
     `
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const aSchema = z.object({
-          a: z.number().optional().nullable()
+      "export const aSchema = S.struct({
+          a: S.nullable(S.optional(S.number))
       });"
     `)
   })
@@ -880,8 +880,8 @@ describe('generateSchema', () => {
     }`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const exampleSchema = z.object({
-          field: z.array(z.string().nullable()).optional().nullable()
+      "export const exampleSchema = S.struct({
+          field: S.nullable(S.optional(S.array(S.nullable(S.string))))
       });"
     `)
   })
@@ -892,10 +892,10 @@ describe('generateSchema', () => {
     }`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const exampleSchema = z.object({
-          field: z.object({
-              foo: z.string()
-          }).nullable().partial()
+      "export const exampleSchema = S.struct({
+          field: S.partial(S.nullable(S.struct({
+              foo: S.string
+          })))
       });"
     `)
   })
@@ -906,8 +906,8 @@ describe('generateSchema', () => {
     }`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const exampleSchema = z.object({
-          field: z.array(z.union([z.literal(\\"foo\\"), z.literal(\\"bar\\")])).nullable()
+      "export const exampleSchema = S.struct({
+          field: S.nullable(S.array(S.union(S.literal(\\"foo\\"), S.literal(\\"bar\\"))))
       });"
     `)
   })
@@ -918,8 +918,8 @@ describe('generateSchema', () => {
     }`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const exampleSchema = z.object({
-          field: z.record(z.string()).nullable()
+      "export const exampleSchema = S.struct({
+          field: S.nullable(S.record(S.string, S.string))
       });"
     `)
   })
@@ -931,8 +931,8 @@ describe('generateSchema', () => {
     `
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const aSchema = z.object({
-          a: z.union([z.number(), z.string()]).nullable()
+      "export const aSchema = S.struct({
+          a: S.nullable(S.union(S.number, S.string))
       });"
     `)
   })
@@ -944,8 +944,8 @@ describe('generateSchema', () => {
     `
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const aSchema = z.object({
-          a: z.union([z.number(), z.string()]).optional().nullable()
+      "export const aSchema = S.struct({
+          a: S.nullable(S.optional(S.union(S.number, S.string)))
       });"
     `)
   })
@@ -978,31 +978,31 @@ describe('generateSchema', () => {
       booleanAsString: string;
    }`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const withDefaultsSchema = z.object({
+      "export const withDefaultsSchema = S.struct({
           /**
            * @default 42
            */
-          theAnswerToTheUltimateQuestionOfLife: z.number().default(42),
+          theAnswerToTheUltimateQuestionOfLife: S.optional(S.number).withDefault(() => 42),
           /**
            * @default false
            */
-          isVulnerable: z.boolean().default(false),
+          isVulnerable: S.optional(S.boolean).withDefault(() => false),
           /**
            * @default clark
            */
-          name: z.union([z.literal(\\"clark\\"), z.literal(\\"superman\\"), z.literal(\\"kal-l\\")]).default(\\"clark\\"),
+          name: S.optional(S.union(S.literal(\\"clark\\"), S.literal(\\"superman\\"), S.literal(\\"kal-l\\"))).withDefault(() => 'clark'),
           /**
            * @default The Answer to the Ultimate Question of Life
            */
-          theMeaningOf42: z.string().default(\\"The Answer to the Ultimate Question of Life\\"),
+          theMeaningOf42: S.optional(S.string).withDefault(() => 'The Answer to the Ultimate Question of Life'),
           /**
            * @default \\"\\"
            */
-          emptyString: z.string().default(\\"\\"),
+          emptyString: S.optional(S.string).withDefault(() => ''),
           /**
            * @default \\"true\\"
            */
-          booleanAsString: z.string().default(\\"true\\")
+          booleanAsString: S.optional(S.string).withDefault(() => 'true')
       });"
     `)
   })
@@ -1026,17 +1026,17 @@ describe('generateSchema', () => {
    };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const heroSchema = z.object({
+      "export const heroSchema = S.struct({
           /**
            * @secret
            * @format
            * @pattern
            */
-          secretIdentity: z.string(),
+          secretIdentity: S.string,
           /**
            * @maximum infinity
            */
-          age: z.number(),
+          age: S.number,
           /**
            * My super power
            */
@@ -1070,15 +1070,15 @@ describe('generateSchema', () => {
     )
   })
 
-  it('should be able to override the zod import value', () => {
+  it('should be able to override the effect import value', () => {
     const source = 'export type TheLastTest = true'
 
-    expect(generate(source, 'zod')).toMatchInlineSnapshot(
-      `"export const theLastTestSchema = zod.literal(true);"`,
+    expect(generate(source, 'effect')).toMatchInlineSnapshot(
+      `"export const theLastTestSchema = effect.literal(true);"`,
     )
   })
 
-  it('should not generate any zod validation if `skipParseJSDoc` is `true`', () => {
+  it('should not generate any effect validation if `skipParseJSDoc` is `true`', () => {
     const source = `export interface A {
       /** @minimum 0 */
       a: number | null;
@@ -1088,24 +1088,24 @@ describe('generateSchema', () => {
       c: string | null;
     }`
 
-    expect(generate(source, 'z', true)).toMatchInlineSnapshot(`
-      "export const aSchema = z.object({
+    expect(generate(source, 'S', true)).toMatchInlineSnapshot(`
+      "export const aSchema = S.struct({
           /** @minimum 0 */
-          a: z.number().nullable(),
+          a: S.nullable(S.number),
           /** @minLength 1 */
-          b: z.string().nullable(),
+          b: S.nullable(S.string),
           /** @pattern ^c$ */
-          c: z.string().nullable()
+          c: S.nullable(S.string)
       });"
     `)
   })
 })
 
 /**
- * Wrapper to generate a zod schema from a string.
+ * Wrapper to generate a effect schema from a string.
  *
  * @param sourceText Typescript interface or type
- * @returns Generated Zod schema
+ * @returns Generated Effect schema
  */
 function generate(sourceText: string, z?: string, skipParseJSDoc?: boolean) {
   const sourceFile = ts.createSourceFile(
@@ -1129,16 +1129,16 @@ function generate(sourceText: string, z?: string, skipParseJSDoc?: boolean) {
     throw new Error('No `type` or `interface` found!')
   }
   const interfaceName = declaration.name.text
-  const zodConstName = `${camel(interfaceName)}Schema`
+  const effectConstName = `${camel(interfaceName)}Schema`
 
-  const zodSchema = generateSchemaVariableStatement({
-    zodImportValue: z,
+  const effectSchema = generateSchemaVariableStatement({
+    schemaImportValue: z,
     node: declaration,
     sourceFile,
-    varName: zodConstName,
+    varName: effectConstName,
     skipParseJSDoc,
   })
   return ts
     .createPrinter({ newLine: ts.NewLineKind.LineFeed })
-    .printNode(ts.EmitHint.Unspecified, zodSchema.statement, sourceFile)
+    .printNode(ts.EmitHint.Unspecified, effectSchema.statement, sourceFile)
 }

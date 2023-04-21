@@ -15,6 +15,45 @@ import { generateSchemaVariableStatement } from './generateSchema'
 import { transformRecursiveSchema } from './transformRecursiveSchema'
 import { standardBuiltInObjectVarNames } from './const'
 
+const getSchemaNameList =
+  (nameList: string[] = []) => (statement?: ts.VariableStatement | string) => {
+    if (!statement) {
+      return nameList
+    }
+
+    if (typeof statement === 'string') {
+      if (!nameList.includes(statement)) {
+        nameList.push(statement)
+      }
+      return nameList
+    }
+    const getEscapedTextFun = (data: Record<string, unknown>) => {
+      for (const [key, item] of Object.entries(data)) {
+        if (
+          !item ||
+          typeof item !== 'object' ||
+          ['modifiers', 'emitNode'].includes(key)
+        ) {
+          continue
+        }
+        const escapedText = (item as unknown as { escapedText: string })
+          .escapedText
+        if (escapedText && !nameList.includes(escapedText)) {
+          nameList.push(escapedText)
+        }
+
+        if (Array.isArray(item)) {
+          item.forEach(getEscapedTextFun)
+          continue
+        }
+        getEscapedTextFun(item as Record<string, unknown>)
+      }
+    }
+    getEscapedTextFun(statement as unknown as Record<string, unknown>)
+
+    return nameList
+  }
+
 export interface GenerateProps {
   /**
    * Content of the typescript source file.
@@ -43,20 +82,20 @@ export interface GenerateProps {
   keepComments?: boolean
 
   /**
-   * Skip the creation of zod validators from JSDoc annotations
+   * Skip the creation of effect validators from JSDoc annotations
    *
    * @default false
    */
   skipParseJSDoc?: boolean
 
   /**
-   * Path of z.infer<> types file.
+   * Path of S.To<> types file.
    */
   inferredTypes?: string
 }
 
 /**
- * Generate zod schemas and integration tests from a typescript file.
+ * Generate effect schemas and integration tests from a typescript file.
  *
  * This function take care of the sorting of the `const` declarations and solved potential circular references
  */
@@ -73,8 +112,10 @@ export function generate({
 
   // Extract the nodes (interface declarations & type aliases)
   const nodes: TypeNode[] = []
+  // The schema name used
+  const getSchemaNameFun = getSchemaNameList()
 
-  // declare a map to store the interface name and its corresponding zod schema
+  // declare a map to store the interface name and its corresponding effect schema
   const typeNameMapping = new Map<string, TypeNode>()
 
   const typesNeedToBeExtracted = new Set<string>()
@@ -115,12 +156,12 @@ export function generate({
     }
   })
 
-  // Generate zod schemas
-  const zodSchemas = nodes.map((node) => {
+  // Generate effect schemas
+  const effectSchemas = nodes.map((node) => {
     const typeName = node.name.text
     const varName = getSchemaName(typeName)
-    const zodSchema = generateSchemaVariableStatement({
-      zodImportValue: 'z',
+    const effectSchema = generateSchemaVariableStatement({
+      schemaImportValue: 'S',
       node,
       sourceFile,
       varName,
@@ -128,30 +169,29 @@ export function generate({
       skipParseJSDoc,
     })
 
-    return { typeName, varName, ...zodSchema }
+    return { typeName, varName, ...effectSchema }
   })
-  const zodSchemaNames = zodSchemas.map(({ varName }) => varName)
 
-  // Zod schemas with direct or indirect dependencies that are not in `zodSchemas`, won't be generated
-  const zodSchemasWithMissingDependencies = new Set<string>()
+  const effectSchemaNames = effectSchemas.map(({ varName }) => varName)
+
+  // Effect schemas with direct or indirect dependencies that are not in `effectSchemas`, won't be generated
+  const effectSchemasWithMissingDependencies = new Set<string>()
   const standardBuiltInObjects = new Set<string>()
-  zodSchemas.forEach(
-    ({ varName, dependencies, statement, typeName, requiresImport }) => {
-      dependencies
-        .filter((dep) => !zodSchemaNames.includes(dep))
-        .forEach((dep) => {
-          if (standardBuiltInObjectVarNames.includes(dep)) {
-            standardBuiltInObjects.add(dep)
-          } else {
-            zodSchemasWithMissingDependencies.add(dep)
-            zodSchemasWithMissingDependencies.add(varName)
-          }
-        })
-    },
-  )
-  zodSchemaNames.push(...standardBuiltInObjects)
+  effectSchemas.forEach(({ varName, dependencies }) => {
+    dependencies
+      .filter((dep) => !effectSchemaNames.includes(dep))
+      .forEach((dep) => {
+        if (standardBuiltInObjectVarNames.includes(dep)) {
+          standardBuiltInObjects.add(dep)
+        } else {
+          effectSchemasWithMissingDependencies.add(dep)
+          effectSchemasWithMissingDependencies.add(varName)
+        }
+      })
+  })
+  effectSchemaNames.push(...standardBuiltInObjects)
 
-  zodSchemas.push(
+  effectSchemas.push(
     ...Array.from(standardBuiltInObjects).map((obj) => {
       const typeName = obj[0].toUpperCase() + obj.substring(1, obj.length - 6)
       return {
@@ -159,7 +199,7 @@ export function generate({
         varName: obj,
         ...generateSchemaVariableStatement({
           typeName,
-          zodImportValue: 'z',
+          schemaImportValue: 'S',
           sourceFile,
           varName: obj,
           getDependencyName: getSchemaName,
@@ -181,15 +221,15 @@ export function generate({
   // Loop until no more schemas can be generated and no more schemas with direct or indirect missing dependencies are found
   while (
     !done &&
-    statements.size + zodSchemasWithMissingDependencies.size !==
-      zodSchemas.length
+    statements.size + effectSchemasWithMissingDependencies.size !==
+      effectSchemas.length
   ) {
     done = true
-    zodSchemas
+    effectSchemas
       .filter(
         ({ varName }) =>
           !statements.has(varName) &&
-          !zodSchemasWithMissingDependencies.has(varName),
+          !effectSchemasWithMissingDependencies.has(varName),
       )
       .forEach(
         ({ varName, dependencies, statement, typeName, requiresImport }) => {
@@ -200,9 +240,10 @@ export function generate({
           if (notGeneratedDependencies.length === 0) {
             done = false
             if (isCircular) {
+              getSchemaNameFun('lazy')
               typeImports.add(typeName)
               statements.set(varName, {
-                value: transformRecursiveSchema('z', statement, typeName),
+                value: transformRecursiveSchema('S', statement, typeName),
                 typeName,
               })
             } else {
@@ -212,31 +253,34 @@ export function generate({
               statements.set(varName, { value: statement, typeName })
             }
           } else if (
-            // Check if every dependency is (in `zodSchemas` and not in `zodSchemasWithMissingDependencies`)
+            // Check if every dependency is (in `effectSchemas` and not in `effectSchemasWithMissingDependencies`)
             !notGeneratedDependencies.every(
               (dep) =>
-                zodSchemaNames.includes(dep) &&
-                !zodSchemasWithMissingDependencies.has(dep),
+                effectSchemaNames.includes(dep) &&
+                !effectSchemasWithMissingDependencies.has(dep),
             )
           ) {
             done = false
-            zodSchemasWithMissingDependencies.add(varName)
+            effectSchemasWithMissingDependencies.add(varName)
           }
         },
       )
   }
 
   // Generate remaining schemas, which have circular dependencies with loop of length > 1 like: A->B—>C->A
-  zodSchemas
-    .filter(
-      ({ varName }) =>
+  effectSchemas
+    .filter(({ varName, statement }) => {
+      getSchemaNameFun(statement)
+      return (
         !statements.has(varName) &&
-        !zodSchemasWithMissingDependencies.has(varName),
-    )
+        !effectSchemasWithMissingDependencies.has(varName)
+      )
+    })
     .forEach(({ varName, statement, typeName }) => {
       typeImports.add(typeName)
+      getSchemaNameFun('lazy')
       statements.set(varName, {
-        value: transformRecursiveSchema('z', statement, typeName),
+        value: transformRecursiveSchema('S', statement, typeName),
         typeName,
       })
     })
@@ -244,14 +288,14 @@ export function generate({
   // Warn the user of possible not resolvable loops
   const errors: string[] = []
 
-  if (zodSchemasWithMissingDependencies.size > 0) {
+  if (effectSchemasWithMissingDependencies.size > 0) {
     errors.push(
       `Some schemas can't be generated due to direct or indirect missing dependencies:
-${Array.from(zodSchemasWithMissingDependencies).join('\n')}`,
+${Array.from(effectSchemasWithMissingDependencies).join('\n')}`,
     )
   }
 
-  // Create output files (zod schemas & integration tests)
+  // Create output files (effect schemas & integration tests)
   const printer = ts.createPrinter({
     newLine: ts.NewLineKind.LineFeed,
     removeComments: !keepComments,
@@ -267,7 +311,10 @@ ${Array.from(zodSchemasWithMissingDependencies).join('\n')}`,
   const transformedSourceText = printerWithComments.printFile(sourceFile)
 
   const imports = Array.from(typeImports.values())
-  const getZodSchemasFile = (typesImportPath: string, sourceText: string) => {
+  const getEffectSchemasFile = (
+    typesImportPath: string,
+    sourceText: string,
+  ) => {
     const typeImports = []
     const valueImports = []
 
@@ -278,10 +325,19 @@ ${Array.from(zodSchemasWithMissingDependencies).join('\n')}`,
         valueImports.push(type)
       }
     }
+    const usedSchemaNames = getSchemaNameFun()
 
     return `// Generated by ts-to-effect-schema
-import { z } from "zod";
+import * as S from "@effect/schema/Schema";
 ${
+  usedSchemaNames.includes('lazy')
+    ? 'import type { ReadonlyDeep } from "type-fest";\n'
+    : ''
+}${
+  usedSchemaNames.includes('pipe')
+    ? 'import { pipe } from "@effect/data/Function";\n'
+    : ''
+}${
   typeImports.length
     ? `import type { ${typeImports.join(', ')} } from "${typesImportPath}";\n`
     : ''
@@ -300,19 +356,20 @@ ${Array.from(statements.values())
     Array.from(statements.values())
       .filter(isExported)
       .map((i) => ({
-        zodType: `${getSchemaName(i.typeName)}InferredType`,
+        effectType: `${getSchemaName(i.typeName)}InferredType`,
         tsType: `spec.${i.typeName}`,
       })),
   )
 
   const getIntegrationTestFile = (
     typesImportPath: string,
-    zodSchemasImportPath: string,
+    effectSchemasImportPath: string,
   ) => `// Generated by ts-to-effect-schema
-import { z } from "zod";
+  import * as S from "@effect/schema/Schema";
+  import type { ReadonlyDeep } from "type-fest";
 
 import * as spec from "${typesImportPath}";
-import * as generated from "${zodSchemasImportPath}";
+import * as generated from "${effectSchemasImportPath}";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function expectType<T>(_: T) {
@@ -322,35 +379,36 @@ function expectType<T>(_: T) {
 ${Array.from(statements.values())
   .filter(isExported)
   .map((statement) => {
-    // Generate z.infer<>
-    const zodInferredSchema = generateSchemaInferredType({
+    // Generate S.To<>
+    const effectInferredSchema = generateSchemaInferredType({
       aliasName: `${getSchemaName(statement.typeName)}InferredType`,
-      zodConstName: `generated.${getSchemaName(statement.typeName)}`,
-      zodImportValue: 'z',
+      effectConstName: `generated.${getSchemaName(statement.typeName)}`,
+      effectImportValue: 'S',
     })
 
-    return print(zodInferredSchema)
+    return print(effectInferredSchema)
   })
   .join('\n\n')}
 
 ${testCases.map(print).join('\n')}
 `
 
-  const getInferredTypes = (zodSchemasImportPath: string) => `// Generated by ts-to-effect-schema
-import { z } from "zod";
+  const getInferredTypes = (effectSchemasImportPath: string) => `// Generated by ts-to-effect-schema
+import * as S from "@effect/schema/Schema";
 
-import * as generated from "${zodSchemasImportPath}";
+
+import * as generated from "${effectSchemasImportPath}";
 
 ${Array.from(statements.values())
   .filter(isExported)
   .map((statement) => {
-    const zodInferredSchema = generateSchemaInferredType({
+    const effectInferredSchema = generateSchemaInferredType({
       aliasName: statement.typeName,
-      zodConstName: `generated.${getSchemaName(statement.typeName)}`,
-      zodImportValue: 'z',
+      effectConstName: `generated.${getSchemaName(statement.typeName)}`,
+      effectImportValue: 'S',
     })
 
-    return print(zodInferredSchema)
+    return print(effectInferredSchema)
   })
   .join('\n\n')}
 `
@@ -362,24 +420,24 @@ ${Array.from(statements.values())
     transformedSourceText,
 
     /**
-     * Get the content of the zod schemas file.
+     * Get the content of the effect schemas file.
      *
      * @param typesImportPath Relative path of the source file
      */
-    getZodSchemasFile,
+    getEffectSchemasFile,
 
     /**
      * Get the content of the integration tests file.
      *
      * @param typesImportPath Relative path of the source file
-     * @param zodSchemasImportPath Relative path of the zod schemas file
+     * @param effectSchemasImportPath Relative path of the effect schemas file
      */
     getIntegrationTestFile,
 
     /**
-     * Get the content of the zod inferred types files.
+     * Get the content of the effect inferred types files.
      *
-     * @param zodSchemasImportPath Relative path of the zod schemas file
+     * @param effectSchemasImportPath Relative path of the effect schemas file
      */
     getInferredTypes,
 
@@ -389,7 +447,7 @@ ${Array.from(statements.values())
     errors,
 
     /**
-     * `true` if zodSchemaFile have some resolvable circular dependencies
+     * `true` if effectSchemaFile have some resolvable circular dependencies
      */
     hasCircularDependencies: imports.length > 0,
   }

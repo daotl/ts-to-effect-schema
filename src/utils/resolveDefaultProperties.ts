@@ -4,7 +4,7 @@ import { getJSDocTags } from '../core/jsDocTags'
 /**
  * Remove optional properties when `@default` jsdoc tag is defined.
  *
- * Indeed, `z.{type}().optional().default({value})` will be
+ * Indeed, `S.optional(S.{type}).withDefault({value})` will be
  * compile as a non-optional type.
  */
 export function resolveDefaultProperties(sourceText: string) {
@@ -38,7 +38,7 @@ export function resolveDefaultProperties(sourceText: string) {
       return node
     }
 
-    return (node) => ts.visitNode(node, visit)
+    return (node) => ts.visitNode(node, visit, ts.isSourceFile)!
   }
 
   const outputFile = ts.transform(sourceFile, [removeOptionalTransformer])

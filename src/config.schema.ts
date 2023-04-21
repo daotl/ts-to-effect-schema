@@ -42,4 +42,4 @@ export const configsSchema = z.array(
   ),
 )
 
-export const tsToZodConfigSchema = z.union([configSchema, configsSchema])
+export const tsToEffectConfigSchema = z.union([configSchema, configsSchema])

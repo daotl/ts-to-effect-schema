@@ -6,9 +6,9 @@ import { join, relative, parse } from 'path'
 import slash from 'slash'
 import ts from 'typescript'
 import { generate, GenerateProps } from './core/generate'
-import { TsToZodConfig, Config } from './config'
+import { TsToEffectConfig, Config } from './config'
 import {
-  tsToZodConfigSchema,
+  tsToEffectConfigSchema,
   getSchemaNameSchema,
   nameFilterSchema,
 } from './config.schema'
@@ -25,9 +25,9 @@ type ConfigExt = '.js' | '.cjs'
 
 // Try to load `ts-to-effect-schema.config.js`
 // We are doing this here to be able to infer the `flags` & `usage` in the cli help
-const tsToZodConfig = 'ts-to-effect-schema.config'
-const configPath = join(process.cwd(), tsToZodConfig)
-let config: TsToZodConfig | undefined
+const tsToEffectConfig = 'ts-to-effect-schema.config'
+const configPath = join(process.cwd(), tsToEffectConfig)
+let config: TsToEffectConfig | undefined
 let haveMultiConfig = false
 const configKeys: string[] = []
 
@@ -43,7 +43,7 @@ try {
     const rawConfig = require(slash(
       relative(__dirname, `${configPath}${configExt}`),
     ))
-    config = tsToZodConfigSchema.parse(rawConfig)
+    config = tsToEffectConfigSchema.parse(rawConfig)
     if (Array.isArray(config)) {
       haveMultiConfig = true
       configKeys.push(...config.map((c) => c.name))
@@ -52,7 +52,7 @@ try {
 } catch (e) {
   if (e instanceof Error) {
     oclifError(
-      `"${tsToZodConfig}${configExt}" invalid:
+      `"${tsToEffectConfig}${configExt}" invalid:
   ${e.message}
 
   Please fix the invalid configuration
@@ -63,8 +63,8 @@ try {
   process.exit(2)
 }
 
-class TsToZod extends Command {
-  static description = 'Generate Zod schemas from a Typescript file'
+class TsToEffect extends Command {
+  static description = 'Generate Effect schemas from a Typescript file'
 
   static usage = haveMultiConfig
     ? [
@@ -93,14 +93,15 @@ class TsToZod extends Command {
     }),
     skipParseJSDoc: flags.boolean({
       default: false,
-      description: 'Skip the creation of zod validators from JSDoc annotations',
+      description:
+        'Skip the creation of effect schema validators from JSDoc annotations',
     }),
     skipValidation: flags.boolean({
       default: false,
       description: 'Skip the validation step (not recommended)',
     }),
     inferredTypes: flags.string({
-      description: 'Path of z.infer<> types file',
+      description: 'Path of S.To<> types file',
     }),
     watch: flags.boolean({
       char: 'w',
@@ -126,12 +127,12 @@ class TsToZod extends Command {
     { name: 'input', description: 'input file (typescript)' },
     {
       name: 'output',
-      description: 'output file (zod schemas)',
+      description: 'output file (effect schemas)',
     },
   ]
 
   async run() {
-    const { args, flags } = this.parse(TsToZod)
+    const { args, flags } = this.parse(TsToEffect)
     if (flags.init) {
       ;(await createConfig(configPath))
         ? this.log('🧐 ts-to-effect-schema.config.js created!')
@@ -149,7 +150,7 @@ class TsToZod extends Command {
         this.log(`Generating "${config.name}"`)
         const result = await this.generate(args, config, flags)
         if (result.success) {
-          this.log(' 🎉 Zod schemas generated!')
+          this.log(' 🎉 Effect schemas generated!')
         } else {
           this.error(result.error, { exit: false })
         }
@@ -158,7 +159,7 @@ class TsToZod extends Command {
     } else {
       const result = await this.generate(args, fileConfig, flags)
       if (result.success) {
-        this.log('🎉 Zod schemas generated!')
+        this.log('🎉 Effect schemas generated!')
       } else {
         this.error(result.error)
       }
@@ -179,7 +180,7 @@ class TsToZod extends Command {
 
         const result = await this.generate(args, config, flags)
         if (result.success) {
-          this.log('🎉 Zod schemas generated!')
+          this.log('🎉 Effect schemas generated!')
         } else {
           this.error(result.error)
         }
@@ -189,7 +190,7 @@ class TsToZod extends Command {
   }
 
   /**
-   * Generate on zod schema file.
+   * Generate on effect schema file.
    * @param args
    * @param fileConfig
    * @param flags
@@ -197,7 +198,7 @@ class TsToZod extends Command {
   async generate(
     args: { input?: string; output?: string },
     fileConfig: Config | undefined,
-    flags: OutputFlags<typeof TsToZod.flags>,
+    flags: OutputFlags<typeof TsToEffect.flags>,
   ): Promise<{ success: true } | { success: false; error: string }> {
     const input = args.input || fileConfig?.input
     const output = args.output || fileConfig?.output
@@ -206,7 +207,7 @@ class TsToZod extends Command {
       return {
         success: false,
         error: `Missing 1 required arg:
-${TsToZod.args[0].description}
+${TsToEffect.args[0].description}
 See more help with --help`,
       }
     }
@@ -265,7 +266,7 @@ See more help with --help`,
     const {
       errors,
       transformedSourceText,
-      getZodSchemasFile,
+      getEffectSchemasFile,
       getIntegrationTestFile,
       getInferredTypes,
       hasCircularDependencies,
@@ -283,6 +284,7 @@ See more help with --help`,
 
     if (!flags.skipValidation) {
       const validatorSpinner = ora('Validating generated types').start()
+
       if (flags.all) {
         validatorSpinner.indent = 1
       }
@@ -292,11 +294,11 @@ See more help with --help`,
           relativePath: './source.ts',
         },
         integrationTests: {
-          sourceText: getIntegrationTestFile('./source', './source.zod'),
+          sourceText: getIntegrationTestFile('./source', './source.schema'),
           relativePath: './source.integration.ts',
         },
-        zodSchemas: {
-          sourceText: getZodSchemasFile('./source', sourceText),
+        effectSchemas: {
+          sourceText: getEffectSchemasFile('./source', sourceText),
           relativePath: './source.schema.ts',
         },
         skipParseJSDoc: Boolean(generateOptions.skipParseJSDoc),
@@ -314,7 +316,7 @@ See more help with --help`,
       }
     }
 
-    const zodSchemasFile = getZodSchemasFile(
+    const effectSchemasFile = getEffectSchemasFile(
       getImportPath(outputPath, inputPath) + (flags.esm ? '.js' : ''),
       sourceText,
     )
@@ -322,21 +324,21 @@ See more help with --help`,
     const prettierConfig = await prettier.resolveConfig(process.cwd())
 
     if (generateOptions.inferredTypes) {
-      const zodInferredTypesFile = getInferredTypes(
+      const effectInferredTypesFile = getInferredTypes(
         getImportPath(generateOptions.inferredTypes, outputPath),
       )
       await outputFile(
         generateOptions.inferredTypes,
         prettier.format(
           hasExtensions(generateOptions.inferredTypes, javascriptExtensions)
-            ? ts.transpileModule(zodInferredTypesFile, {
+            ? ts.transpileModule(effectInferredTypesFile, {
                 compilerOptions: {
                   target: ts.ScriptTarget.Latest,
                   module: ts.ModuleKind.ESNext,
                   newLine: ts.NewLineKind.LineFeed,
                 },
               }).outputText
-            : zodInferredTypesFile,
+            : effectInferredTypesFile,
           { parser: 'babel-ts', ...prettierConfig },
         ),
       )
@@ -346,7 +348,7 @@ See more help with --help`,
       await outputFile(
         outputPath,
         prettier.format(
-          ts.transpileModule(zodSchemasFile, {
+          ts.transpileModule(effectSchemasFile, {
             compilerOptions: {
               target: ts.ScriptTarget.Latest,
               module: ts.ModuleKind.ESNext,
@@ -359,7 +361,7 @@ See more help with --help`,
     } else {
       await outputFile(
         outputPath,
-        prettier.format(zodSchemasFile, {
+        prettier.format(effectSchemasFile, {
           parser: 'babel-ts',
           ...prettierConfig,
         }),
@@ -372,10 +374,10 @@ See more help with --help`,
    * Load user config from `ts-to-effect-schema.config.js`
    */
   async loadFileConfig(
-    config: TsToZodConfig | undefined,
-    flags: OutputFlags<typeof TsToZod.flags>,
+    config: TsToEffectConfig | undefined,
+    flags: OutputFlags<typeof TsToEffect.flags>,
     ext: ConfigExt,
-  ): Promise<TsToZodConfig | undefined> {
+  ): Promise<TsToEffectConfig | undefined> {
     if (!config) {
       return undefined
     }
@@ -386,12 +388,12 @@ See more help with --help`,
         }>([
           {
             name: 'mode',
-            message: `You have multiple configs available in "${tsToZodConfig}${ext}"\n What do you want?`,
+            message: `You have multiple configs available in "${tsToEffectConfig}${ext}"\n What do you want?`,
             type: 'list',
             choices: [
               {
                 value: 'multi',
-                name: `${TsToZod.flags.all.description} (--all)`,
+                name: `${TsToEffect.flags.all.description} (--all)`,
               },
               ...configKeys.map((key) => ({
                 value: `single-${key}`,
@@ -447,4 +449,4 @@ function hasExtensions(path: string, extensions: string[]) {
   return extensions.includes(ext)
 }
 
-export = TsToZod
+export = TsToEffect

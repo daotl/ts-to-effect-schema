@@ -2,14 +2,14 @@ export { generate, GenerateProps } from './core/generate'
 
 export {
   generateSchemaInferredType,
-  GenerateZodInferredTypeProps,
+  GenerateEffectInferredTypeProps,
 } from './core/generateSchemaInferredType'
 
 export {
   generateSchemaVariableStatement,
-  GenerateZodSchemaProps,
+  GenerateEffectSchemaProps,
 } from './core/generateSchema'
 
 export { generateIntegrationTests } from './core/generateIntegrationTests'
 
-export { TsToZodConfig } from './config'
+export { TsToEffectConfig } from './config'

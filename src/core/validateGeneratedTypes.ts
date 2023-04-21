@@ -1,3 +1,4 @@
+import fs from 'fs'
 import {
   createDefaultMapFromNodeModules,
   createFSBackedSystem,
@@ -12,17 +13,17 @@ interface File {
 }
 export interface ValidateGeneratedTypesProps {
   sourceTypes: File
-  zodSchemas: File
+  effectSchemas: File
   integrationTests: File
   skipParseJSDoc: boolean
 }
 
 /**
- * Use typescript compiler to validate the generated zod schemas.
+ * Use typescript compiler to validate the generated effect schemas.
  */
 export function validateGeneratedTypes({
   sourceTypes,
-  zodSchemas,
+  effectSchemas,
   integrationTests,
   skipParseJSDoc,
 }: ValidateGeneratedTypesProps) {
@@ -43,17 +44,19 @@ export function validateGeneratedTypes({
       ? sourceTypes.sourceText
       : resolveDefaultProperties(sourceTypes.sourceText),
   )
-  fsMap.set(getPath(zodSchemas), zodSchemas.sourceText)
+  fsMap.set(getPath(effectSchemas), effectSchemas.sourceText)
   fsMap.set(getPath(integrationTests), integrationTests.sourceText)
 
   // Create a virtual typescript environment
   const system = createFSBackedSystem(fsMap, projectRoot, ts)
   const env = createVirtualTypeScriptEnvironment(
     system,
-    [sourceTypes, zodSchemas, integrationTests].map(getPath),
+    [sourceTypes, effectSchemas, integrationTests].map(getPath),
     ts,
     compilerOptions,
   )
+
+  fs.writeFileSync('./test.txt', integrationTests.sourceText)
 
   // Get the diagnostic
   const errors: ts.Diagnostic[] = []
@@ -63,7 +66,6 @@ export function validateGeneratedTypes({
   errors.push(
     ...env.languageService.getSyntacticDiagnostics(getPath(integrationTests)),
   )
-
   return errors.map((diagnostic) => {
     const message = ts.flattenDiagnosticMessageText(
       diagnostic.messageText,
@@ -75,10 +77,10 @@ export function validateGeneratedTypes({
       )
       const details = getDetails(diagnostic.file, position.line)
 
-      if (details.zodType && details.specType && details.from) {
+      if (details.effectType && details.specType && details.from) {
         return details.from === 'spec'
-          ? `'${details.specType}' is not compatible with '${details.zodType}':\n${message}`
-          : `'${details.zodType}' is not compatible with '${details.specType}':\n${message}`
+          ? `'${details.specType}' is not compatible with '${details.effectType}':\n${message}`
+          : `'${details.effectType}' is not compatible with '${details.specType}':\n${message}`
       }
     }
     return message
@@ -91,7 +93,7 @@ function getDetails(file: ts.SourceFile, line: number) {
   const expression: {
     source: string
     specType?: string
-    zodType?: string
+    effectType?: string
     from?: 'type' | 'spec'
   } = {
     source,
@@ -104,7 +106,7 @@ function getDetails(file: ts.SourceFile, line: number) {
       }
     }
     if (chunk.endsWith('InferredType')) {
-      expression.zodType = chunk.slice(0, -'InferredType'.length)
+      expression.effectType = chunk.slice(0, -'InferredType'.length)
       if (i === 1) {
         expression.from = 'spec'
       }

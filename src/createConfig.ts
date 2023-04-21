@@ -57,7 +57,7 @@ export async function createConfig(configPath: string) {
     prompts.next({
       type: 'input',
       name: `output-${i}`,
-      message: 'Where do you want to save the generated zod schemas?',
+      message: 'Where do you want to save the generated effect schemas?',
       default: getOutputDefault(),
       prefix: prefix ? `[${prefix}]` : undefined,
     })
@@ -152,7 +152,7 @@ export async function createConfig(configPath: string) {
   const header = `/**
  * ts-to-effect-schema configuration.
  *
- * @type {${dev ? 'import("./src/config")' : 'import("ts-to-effect-schema")'}.TsToZodConfig}
+ * @type {${dev ? 'import("./src/config")' : 'import("ts-to-effect-schema")'}.TsToEffectConfig}
  */
 module.exports = `
 

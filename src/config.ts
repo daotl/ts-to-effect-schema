@@ -25,7 +25,7 @@ export type Config = {
   input: string
 
   /**
-   * Path of the output file (generated zod schemas)
+   * Path of the output file (generated effect schemas)
    */
   output: string
 
@@ -56,14 +56,14 @@ export type Config = {
   keepComments?: boolean
 
   /**
-   * Skip the creation of zod validators from JSDoc annotations
+   * Skip the creation of effect validators from JSDoc annotations
    *
    * @default false
    */
   skipParseJSDoc?: boolean
 
   /**
-   * Path of z.infer<> types file.
+   * Path of S.To<> types file.
    */
   inferredTypes?: string
 }
@@ -79,4 +79,4 @@ export type Configs = Array<
   }
 >
 
-export type TsToZodConfig = Config | Configs
+export type TsToEffectConfig = Config | Configs

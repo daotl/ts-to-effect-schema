@@ -3,7 +3,7 @@ import { getJsDoc } from 'tsutils'
 const { factory: f } = ts
 
 /**
- * List of formats that can be translated in zod functions.
+ * List of formats that can be translated in effect schema functions.
  */
 const formats = [
   'email' as const,
@@ -20,7 +20,7 @@ type TagWithError<T> = {
 }
 
 /**
- * JSDoc special tags that can be converted in zod flags.
+ * JSDoc special tags that can be converted in effect schema flags.
  */
 export interface JSDocTags {
   minimum?: TagWithError<number>
@@ -151,13 +151,13 @@ export function getJSDocTags(nodeType: ts.Node, sourceFile: ts.SourceFile) {
   return jsDocTags
 }
 
-export type ZodProperty = {
+export type EffectSchemaProperty = {
   identifier: string
   expressions?: ts.Expression[]
 }
 
 /**
- * Convert a set of jsDocTags to zod properties
+ * Convert a set of jsDocTags to effect schema properties
  *
  * @param jsDocTags
  * @param isOptional
@@ -165,17 +165,17 @@ export type ZodProperty = {
  * @param isRequired
  * @param isNullable
  */
-export function jsDocTagToZodProperties(
+export function jsDocTagToEffectSchemaProperties(
   jsDocTags: JSDocTags,
   isOptional: boolean,
   isPartial: boolean,
   isRequired: boolean,
   isNullable: boolean,
 ) {
-  const zodProperties: ZodProperty[] = []
+  const effectSchemaProperties: EffectSchemaProperty[] = []
   if (jsDocTags.minimum !== undefined) {
-    zodProperties.push({
-      identifier: 'min',
+    effectSchemaProperties.push({
+      identifier: 'lessThan',
       expressions: withErrorMessage(
         f.createNumericLiteral(jsDocTags.minimum.value),
         jsDocTags.minimum.errorMessage,
@@ -183,8 +183,8 @@ export function jsDocTagToZodProperties(
     })
   }
   if (jsDocTags.maximum !== undefined) {
-    zodProperties.push({
-      identifier: 'max',
+    effectSchemaProperties.push({
+      identifier: 'greaterThan',
       expressions: withErrorMessage(
         f.createNumericLiteral(jsDocTags.maximum.value),
         jsDocTags.maximum.errorMessage,
@@ -192,8 +192,8 @@ export function jsDocTagToZodProperties(
     })
   }
   if (jsDocTags.minLength !== undefined) {
-    zodProperties.push({
-      identifier: 'min',
+    effectSchemaProperties.push({
+      identifier: 'minLength',
       expressions: withErrorMessage(
         f.createNumericLiteral(jsDocTags.minLength.value),
         jsDocTags.minLength.errorMessage,
@@ -201,8 +201,8 @@ export function jsDocTagToZodProperties(
     })
   }
   if (jsDocTags.maxLength !== undefined) {
-    zodProperties.push({
-      identifier: 'max',
+    effectSchemaProperties.push({
+      identifier: 'maxLength',
       expressions: withErrorMessage(
         f.createNumericLiteral(jsDocTags.maxLength.value),
         jsDocTags.maxLength.errorMessage,
@@ -210,7 +210,7 @@ export function jsDocTagToZodProperties(
     })
   }
   if (jsDocTags.format) {
-    zodProperties.push({
+    effectSchemaProperties.push({
       identifier: jsDocTags.format.value,
       expressions: jsDocTags.format.errorMessage
         ? [f.createStringLiteral(jsDocTags.format.errorMessage)]
@@ -218,46 +218,49 @@ export function jsDocTagToZodProperties(
     })
   }
   if (jsDocTags.pattern) {
-    zodProperties.push({
-      identifier: 'regex',
+    effectSchemaProperties.push({
+      identifier: 'pattern',
       expressions: [f.createRegularExpressionLiteral(`/${jsDocTags.pattern}/`)],
     })
   }
   if (isOptional) {
-    zodProperties.push({
+    effectSchemaProperties.push({
       identifier: 'optional',
     })
   }
   if (isNullable) {
-    zodProperties.push({
+    effectSchemaProperties.push({
       identifier: 'nullable',
     })
   }
   if (isPartial) {
-    zodProperties.push({
+    effectSchemaProperties.push({
       identifier: 'partial',
     })
   }
   if (isRequired) {
-    zodProperties.push({
+    effectSchemaProperties.push({
       identifier: 'required',
     })
   }
   if (jsDocTags.default !== undefined) {
-    zodProperties.push({
-      identifier: 'default',
-      expressions:
-        jsDocTags.default === true
-          ? [f.createTrue()]
-          : jsDocTags.default === false
-          ? [f.createFalse()]
-          : typeof jsDocTags.default === 'number'
-          ? [f.createNumericLiteral(jsDocTags.default)]
-          : [f.createStringLiteral(jsDocTags.default)],
+    effectSchemaProperties.push({
+      identifier: 'optional.withDefault',
+      expressions: [
+        f.createCallExpression(f.createIdentifier('withDefault'), undefined, [
+          f.createIdentifier(
+            `() => ${
+              typeof jsDocTags.default === 'string'
+                ? `'${jsDocTags.default}'`
+                : jsDocTags.default
+            }`,
+          ),
+        ]),
+      ],
     })
   }
 
-  return zodProperties
+  return effectSchemaProperties
 }
 
 function withErrorMessage(expression: ts.Expression, errorMessage?: string) {

@@ -3,34 +3,37 @@ import ts from 'typescript'
 const { factory: f } = ts
 
 /**
- * Type hint zod to deal with recursive types.
+ * Type hint effect to deal with recursive types.
  *
- * https://github.com/colinhacks/zod/tree/v3#recursive-types
+ * https://github.com/colinhacks/effect/tree/v3#recursive-types
  */
 export function transformRecursiveSchema(
-  zodImportValue: string,
-  zodStatement: ts.VariableStatement,
+  effectImportValue: string,
+  effectStatement: ts.VariableStatement,
   typeName: string,
 ): ts.VariableStatement {
-  const declaration = zodStatement.declarationList.declarations[0]
+  const declaration = effectStatement.declarationList.declarations[0]
 
   if (!declaration.initializer) {
-    throw new Error('Unvalid zod statement')
+    throw new Error('Unvalid effect statement')
   }
 
   return f.createVariableStatement(
-    zodStatement.modifiers,
+    effectStatement.modifiers,
     f.createVariableDeclarationList(
       [
         f.createVariableDeclaration(
           declaration.name,
           undefined,
-          f.createTypeReferenceNode(`${zodImportValue}.ZodSchema`, [
-            f.createTypeReferenceNode(typeName),
+
+          f.createTypeReferenceNode(`${effectImportValue}.Schema`, [
+            f.createTypeReferenceNode('ReadonlyDeep', [
+              f.createTypeReferenceNode(typeName),
+            ]),
           ]),
           f.createCallExpression(
             f.createPropertyAccessExpression(
-              f.createIdentifier(zodImportValue),
+              f.createIdentifier(effectImportValue),
               f.createIdentifier('lazy'),
             ),
             undefined,

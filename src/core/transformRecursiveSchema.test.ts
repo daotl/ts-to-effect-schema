@@ -6,9 +6,9 @@ describe('transformRecursiveSchema', () => {
   it('should wrap the variable declaration with the appropriate syntax', () => {
     const sourceFile = ts.createSourceFile(
       'index.ts',
-      `export const categorySchema = z.object({
-      name: z.string(),
-      subcategories: z.array(categorySchema),
+      `export const categorySchema = S.struct({
+      name: S.string,
+      subcategories: S.array(categorySchema),
     })`,
       ts.ScriptTarget.Latest,
     )
@@ -18,16 +18,16 @@ describe('transformRecursiveSchema', () => {
       fail('should have a variable declaration')
     }
 
-    const output = transformRecursiveSchema('z', declaration, 'Category')
+    const output = transformRecursiveSchema('S', declaration, 'Category')
 
     const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
 
     expect(
       printer.printNode(ts.EmitHint.Unspecified, output, sourceFile),
     ).toMatchInlineSnapshot(`
-      "export const categorySchema: z.ZodSchema<Category> = z.lazy(() => z.object({
-          name: z.string(),
-          subcategories: z.array(categorySchema),
+      "export const categorySchema: S.Schema<ReadonlyDeep<Category>> = S.lazy(() => S.struct({
+          name: S.string,
+          subcategories: S.array(categorySchema),
       }));"
     `)
   })
@@ -46,7 +46,7 @@ describe('transformRecursiveSchema', () => {
     }
 
     expect(() =>
-      transformRecursiveSchema('z', declaration, 'Category'),
-    ).toThrowErrorMatchingInlineSnapshot(`"Unvalid zod statement"`)
+      transformRecursiveSchema('S', declaration, 'Category'),
+    ).toThrowErrorMatchingInlineSnapshot(`"Unvalid effect statement"`)
   })
 })

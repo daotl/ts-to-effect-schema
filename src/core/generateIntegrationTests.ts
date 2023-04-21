@@ -2,17 +2,17 @@ import ts from 'typescript'
 const { factory: f } = ts
 
 interface TestCase {
-  zodType: string
+  effectType: string
   tsType: string
 }
 
 /**
- * Generate integration tests to validate if the generated zod schemas
+ * Generate integration tests to validate if the generated effect schemas
  * are equals to the originals types.
  *
  * ```ts
- * expectType<${tsType}>({} as ${zodType})
- * expectType<${zodType}>({} as ${tsType})
+ * expectType<${tsType}>({} as ${effectType})
+ * expectType<${effectType}>({} as ${tsType})
  * ```
  */
 export function generateIntegrationTests(testCases: TestCase[]) {
@@ -20,21 +20,33 @@ export function generateIntegrationTests(testCases: TestCase[]) {
     .map((testCase) => [
       f.createCallExpression(
         f.createIdentifier('expectType'),
-        [f.createTypeReferenceNode(testCase.tsType)],
+        [
+          f.createTypeReferenceNode('ReadonlyDeep', [
+            f.createTypeReferenceNode(testCase.tsType),
+          ]),
+        ],
         [
           f.createAsExpression(
             f.createObjectLiteralExpression(),
-            f.createTypeReferenceNode(testCase.zodType),
+            f.createTypeReferenceNode('ReadonlyDeep', [
+              f.createTypeReferenceNode(testCase.tsType),
+            ]),
           ),
         ],
       ),
       f.createCallExpression(
         f.createIdentifier('expectType'),
-        [f.createTypeReferenceNode(testCase.zodType)],
+        [
+          f.createTypeReferenceNode('ReadonlyDeep', [
+            f.createTypeReferenceNode(testCase.tsType),
+          ]),
+        ],
         [
           f.createAsExpression(
             f.createObjectLiteralExpression(),
-            f.createTypeReferenceNode(testCase.tsType),
+            f.createTypeReferenceNode('ReadonlyDeep', [
+              f.createTypeReferenceNode(testCase.tsType),
+            ]),
           ),
         ],
       ),

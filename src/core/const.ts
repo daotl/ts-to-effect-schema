@@ -73,3 +73,31 @@ export const standardBuiltInObjects = [
 export const standardBuiltInObjectVarNames = standardBuiltInObjects.map(
   (n) => `${n[0].toLocaleLowerCase()}${n.substring(1)}Schema`,
 )
+
+export const primitivePropertyList = [
+  // primitive values
+  'string',
+  'number',
+  'bigint',
+  'boolean',
+  'symbol',
+  'object',
+  'Date', // value must be a Date
+
+  // empty types
+  'undefined',
+  'void', // accepts undefined
+  'null',
+
+  // catch-all types
+  // allows any value
+  'any',
+  'unknown',
+
+  // never type
+  // allows no values
+  'never',
+
+  'json',
+  'UUID',
+]

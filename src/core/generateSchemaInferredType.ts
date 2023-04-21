@@ -1,35 +1,34 @@
 import * as ts from 'typescript'
 const { factory: f } = ts
 
-export interface GenerateZodInferredTypeProps {
+export interface GenerateEffectInferredTypeProps {
   aliasName: string
-  zodImportValue: string
-  zodConstName: string
+  effectImportValue: string
+  effectConstName: string
 }
 
 /**
- * Generate zod inferred type.
+ * Generate effect inferred type.
  *
  * ```ts
- *  export type ${aliasName} = ${zodImportValue}.infer<typeof ${zodConstName}>
+ *  export type ${aliasName} = ${effectImportValue}.infer<typeof ${effectConstName}>
  * ```
  */
 export function generateSchemaInferredType({
   aliasName,
-  zodImportValue,
-  zodConstName,
-}: GenerateZodInferredTypeProps) {
+  effectImportValue,
+  effectConstName,
+}: GenerateEffectInferredTypeProps) {
   return f.createTypeAliasDeclaration(
-    undefined,
     [f.createModifier(ts.SyntaxKind.ExportKeyword)],
     f.createIdentifier(aliasName),
     undefined,
     f.createTypeReferenceNode(
       f.createQualifiedName(
-        f.createIdentifier(zodImportValue),
-        f.createIdentifier('infer'),
+        f.createIdentifier(effectImportValue),
+        f.createIdentifier('To'),
       ),
-      [f.createTypeQueryNode(f.createIdentifier(zodConstName))],
+      [f.createTypeQueryNode(f.createIdentifier(effectConstName))],
     ),
   )
 }

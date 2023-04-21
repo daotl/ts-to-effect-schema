@@ -107,7 +107,7 @@ const moduleToPrefix =
         if (ts.isTypeAliasDeclaration(node)) {
           return f.updateTypeAliasDeclaration(
             node,
-            node.decorators,
+            // node.decorators,
             node.modifiers,
             f.createIdentifier(pascal(moduleName) + pascal(node.name.text)),
             node.typeParameters,
@@ -117,6 +117,7 @@ const moduleToPrefix =
                   ts.visitNodes(
                     node.type.members,
                     prefixInterfacesAndTypes(moduleName),
+                    ts.isTypeElement,
                   ),
                 )
               : ts.isTypeReferenceNode(node.type)
@@ -126,6 +127,7 @@ const moduleToPrefix =
                   ts.visitNodes(
                     node.type.typeArguments,
                     prefixInterfacesAndTypes(moduleName),
+                    ts.isTypeNode,
                   ),
                 )
               : node.type,
@@ -135,22 +137,31 @@ const moduleToPrefix =
         if (ts.isInterfaceDeclaration(node)) {
           return f.updateInterfaceDeclaration(
             node,
-            node.decorators,
+            // node.decorators,
             node.modifiers,
             f.createIdentifier(pascal(moduleName) + pascal(node.name.text)),
             node.typeParameters,
             ts.visitNodes(
               node.heritageClauses,
               prefixInterfacesAndTypes(moduleName),
+              ts.isHeritageClause,
             ),
-            ts.visitNodes(node.members, prefixInterfacesAndTypes(moduleName)),
+            ts.visitNodes(
+              node.members,
+              prefixInterfacesAndTypes(moduleName),
+              ts.isTypeElement,
+            ),
           )
         }
 
         if (ts.isHeritageClause(node)) {
           return f.updateHeritageClause(
             node,
-            ts.visitNodes(node.types, prefixInterfacesAndTypes(moduleName)),
+            ts.visitNodes(
+              node.types,
+              prefixInterfacesAndTypes(moduleName),
+              ts.isExpressionWithTypeArguments,
+            ),
           )
         }
 
@@ -173,7 +184,7 @@ const moduleToPrefix =
         if (ts.isEnumDeclaration(node)) {
           return f.updateEnumDeclaration(
             node,
-            node.decorators,
+            // node.decorators,
             node.modifiers,
             f.createIdentifier(pascal(moduleName) + pascal(node.name.text)),
             node.members,
@@ -202,5 +213,9 @@ const moduleToPrefix =
       return ts.visitEachChild(node, flattenModuleDeclaration, context)
     }
 
-    return ts.visitNode(sourceFile, flattenModuleDeclaration)
+    return ts.visitNode<ts.SourceFile, ts.Node, ts.SourceFile>(
+      sourceFile,
+      flattenModuleDeclaration,
+      ts.isSourceFile,
+    )
   }
