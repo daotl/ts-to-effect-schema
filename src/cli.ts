@@ -1,6 +1,9 @@
-import { Command, flags } from '@oclif/command'
-import { OutputFlags } from '@oclif/parser'
-import { error as oclifError } from '@oclif/errors'
+// import { Command, flags } from '@oclif/command'
+import type { OutputFlags } from '@oclif/core/lib/interfaces/parser'
+import { Command, Flags, Args, Errors } from '@oclif/core'
+import type { WritableDeep } from 'type-fest'
+// import { OutputFlags } from '@oclif/parser'
+// import { error as oclifError } from '@oclif/errors'
 import { readFile, outputFile, existsSync } from 'fs-extra'
 import { join, relative, parse } from 'path'
 import slash from 'slash'
@@ -9,8 +12,8 @@ import { generate, GenerateProps } from './core/generate'
 import { TsToEffectConfig, Config } from './config'
 import {
   tsToEffectConfigSchema,
-  getSchemaNameSchema,
-  nameFilterSchema,
+  // getSchemaNameSchema,
+  // nameFilterSchema,
 } from './config.schema'
 import { getImportPath } from './utils/getImportPath'
 import ora from 'ora'
@@ -20,6 +23,7 @@ import inquirer from 'inquirer'
 import { eachSeries } from 'async'
 import { createConfig } from './createConfig'
 import chokidar from 'chokidar'
+import * as S from '@effect/schema/Schema'
 
 type ConfigExt = '.js' | '.cjs'
 
@@ -43,7 +47,9 @@ try {
     const rawConfig = require(slash(
       relative(__dirname, `${configPath}${configExt}`),
     ))
-    config = tsToEffectConfigSchema.parse(rawConfig)
+    const c = S.parse(tsToEffectConfigSchema)(rawConfig)
+    config = c as WritableDeep<typeof c>
+
     if (Array.isArray(config)) {
       haveMultiConfig = true
       configKeys.push(...config.map((c) => c.name))
@@ -51,7 +57,7 @@ try {
   }
 } catch (e) {
   if (e instanceof Error) {
-    oclifError(
+    new Errors.CLIError(
       `"${tsToEffectConfig}${configExt}" invalid:
   ${e.message}
 
@@ -68,54 +74,57 @@ class TsToEffect extends Command {
 
   static usage = haveMultiConfig
     ? [
-        '--all',
-        ...configKeys.map(
-          (key) => `--config ${key.includes(' ') ? `"${key}"` : key}`,
-        ),
-      ]
+      '--all',
+      ...configKeys.map(
+        (key) => `--config ${key.includes(' ') ? `"${key}"` : key}`,
+      ),
+    ]
     : undefined
 
   static flags = {
-    version: flags.version({ char: 'v' }),
-    help: flags.help({ char: 'h' }),
-    esm: flags.boolean({
+    version: Flags.version({ char: 'v' }),
+    help: Flags.help({ char: 'h' }),
+    esm: Flags.boolean({
       default: false,
       description:
         'Generate TypeScript import statements in ESM format (with ".js" extension)',
     }),
-    keepComments: flags.boolean({
+    keepComments: Flags.boolean({
       char: 'k',
       description: 'Keep parameters comments',
     }),
-    init: flags.boolean({
+    init: Flags.boolean({
       char: 'i',
       description: 'Create a ts-to-effect-schema.config.js file',
     }),
-    skipParseJSDoc: flags.boolean({
+    skipParseJSDoc: Flags.boolean({
       default: false,
       description:
         'Skip the creation of effect schema validators from JSDoc annotations',
     }),
-    skipValidation: flags.boolean({
+    skipValidation: Flags.boolean({
       default: false,
       description: 'Skip the validation step (not recommended)',
     }),
-    inferredTypes: flags.string({
+    inferredTypes: Flags.string({
       description: 'Path of S.To<> types file',
     }),
-    watch: flags.boolean({
+    watch: Flags.boolean({
       char: 'w',
       default: false,
       description: 'Watch input file(s) for changes and re-run related task',
     }),
+    config: Flags.custom({
+      multiple: true,
+    })({ char: 'c', options: configKeys, description: 'Execute one config', hidden: !haveMultiConfig, }),
     // -- Multi config flags --
-    config: flags.enum({
-      char: 'c',
-      options: configKeys,
-      description: 'Execute one config',
-      hidden: !haveMultiConfig,
-    }),
-    all: flags.boolean({
+    // config: Flags.enum({
+    //   char: 'c',
+    //   options: configKeys,
+    //   description: 'Execute one config',
+    //   hidden: !haveMultiConfig,
+    // }),
+    all: Flags.boolean({
       char: 'a',
       default: false,
       description: 'Execute all configs',
@@ -123,18 +132,15 @@ class TsToEffect extends Command {
     }),
   }
 
-  static args = [
-    { name: 'input', description: 'input file (typescript)' },
-    {
-      name: 'output',
-      description: 'output file (effect schemas)',
-    },
-  ]
+  static args = {
+    input: Args.string({ description: 'input file (typescript)' }),
+    output: Args.string({ description: 'output file (effect schemas)' }),
+  }
 
   async run() {
-    const { args, flags } = this.parse(TsToEffect)
+    const { args, flags } = await this.parse(TsToEffect)
     if (flags.init) {
-      ;(await createConfig(configPath))
+      ; (await createConfig(configPath))
         ? this.log('🧐 ts-to-effect-schema.config.js created!')
         : this.log('Nothing changed!')
       return
@@ -211,7 +217,7 @@ class TsToEffect extends Command {
       return {
         success: false,
         error: `Missing 1 required arg:
-${TsToEffect.args[0].description}
+${TsToEffect.args.input}
 See more help with --help`,
       }
     }
@@ -336,12 +342,12 @@ See more help with --help`,
         prettier.format(
           hasExtensions(generateOptions.inferredTypes, javascriptExtensions)
             ? ts.transpileModule(effectInferredTypesFile, {
-                compilerOptions: {
-                  target: ts.ScriptTarget.Latest,
-                  module: ts.ModuleKind.ESNext,
-                  newLine: ts.NewLineKind.LineFeed,
-                },
-              }).outputText
+              compilerOptions: {
+                target: ts.ScriptTarget.Latest,
+                module: ts.ModuleKind.ESNext,
+                newLine: ts.NewLineKind.LineFeed,
+              },
+            }).outputText
             : effectInferredTypesFile,
           { parser: 'babel-ts', ...prettierConfig },
         ),
@@ -429,10 +435,10 @@ See more help with --help`,
     return {
       ...config,
       getSchemaName: config.getSchemaName
-        ? getSchemaNameSchema.implement(config.getSchemaName)
+        ? config.getSchemaName //getSchemaNameSchema.implement(config.getSchemaName)
         : undefined,
       nameFilter: config.nameFilter
-        ? nameFilterSchema.implement(config.nameFilter)
+        ? config.nameFilter // nameFilterSchema.implement(config.nameFilter)
         : undefined,
     }
   }
