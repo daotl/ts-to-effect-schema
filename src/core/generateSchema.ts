@@ -86,7 +86,7 @@ export function generateSchemaVariableStatement({
   let requiresImport = false
 
   if (!node) {
-    if (standardBuiltInObjects.includes(typeName!)) {
+    if (standardBuiltInObjects.includes(typeName as string)) {
       schema = buildEffectSchema(schemaImportValue, 'instanceof', [
         f.createIdentifier(typeName as string),
       ])
@@ -415,25 +415,25 @@ function buildEffectSchemaPrimitive({
     }
 
     // Deal with `Promise<>` syntax
-    if (identifierName === 'Promise' && typeNode.typeArguments) {
-      return buildEffectSchema(
-        S,
-        'promise',
-        typeNode.typeArguments.map((i) =>
-          buildEffectSchemaPrimitive({
-            S,
-            typeNode: i,
-            isOptional: false,
-            jsDocTags,
-            sourceFile,
-            dependencies,
-            getDependencyName,
-            skipParseJSDoc,
-          }),
-        ),
-        effectSchemaProperties,
-      )
-    }
+    // if (identifierName === 'Promise' && typeNode.typeArguments) {
+    //   return buildEffectSchema(
+    //     S,
+    //     'promise',
+    //     typeNode.typeArguments.map((i) =>
+    //       buildEffectSchemaPrimitive({
+    //         S,
+    //         typeNode: i,
+    //         isOptional: false,
+    //         jsDocTags,
+    //         sourceFile,
+    //         dependencies,
+    //         getDependencyName,
+    //         skipParseJSDoc,
+    //       }),
+    //     ),
+    //     effectSchemaProperties,
+    //   )
+    // }
 
     // Deal with `Omit<>` & `Pick<>` syntax
     if (['Omit', 'Pick'].includes(identifierName) && typeNode.typeArguments) {
@@ -698,47 +698,47 @@ function buildEffectSchemaPrimitive({
     )
   }
 
-  if (ts.isFunctionTypeNode(typeNode)) {
-    return buildEffectSchema(
-      S,
-      'function',
-      [],
-      [
-        {
-          identifier: 'args',
-          expressions: typeNode.parameters.map((p) =>
-            buildEffectSchemaPrimitive({
-              S,
-              typeNode:
-                p.type || f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-              jsDocTags,
-              sourceFile,
-              dependencies,
-              getDependencyName,
-              isOptional: Boolean(p.questionToken),
-              skipParseJSDoc,
-            }),
-          ),
-        },
-        {
-          identifier: 'returns',
-          expressions: [
-            buildEffectSchemaPrimitive({
-              S,
-              typeNode: typeNode.type,
-              jsDocTags,
-              sourceFile,
-              dependencies,
-              getDependencyName,
-              isOptional: false,
-              skipParseJSDoc,
-            }),
-          ],
-        },
-        ...effectSchemaProperties,
-      ],
-    )
-  }
+  // if (ts.isFunctionTypeNode(typeNode)) {
+  //   return buildEffectSchema(
+  //     S,
+  //     'function',
+  //     [],
+  //     [
+  //       {
+  //         identifier: 'args',
+  //         expressions: typeNode.parameters.map((p) =>
+  //           buildEffectSchemaPrimitive({
+  //             S,
+  //             typeNode:
+  //               p.type || f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+  //             jsDocTags,
+  //             sourceFile,
+  //             dependencies,
+  //             getDependencyName,
+  //             isOptional: Boolean(p.questionToken),
+  //             skipParseJSDoc,
+  //           }),
+  //         ),
+  //       },
+  //       {
+  //         identifier: 'returns',
+  //         expressions: [
+  //           buildEffectSchemaPrimitive({
+  //             S,
+  //             typeNode: typeNode.type,
+  //             jsDocTags,
+  //             sourceFile,
+  //             dependencies,
+  //             getDependencyName,
+  //             isOptional: false,
+  //             skipParseJSDoc,
+  //           }),
+  //         ],
+  //       },
+  //       ...effectSchemaProperties,
+  //     ],
+  //   )
+  // }
 
   if (ts.isIndexedAccessTypeNode(typeNode)) {
     return buildSchemaReference({

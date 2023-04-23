@@ -55,7 +55,8 @@
       "beforeEach",
       "afterEach",
       "it",
-      "expect"
+      "expect",
+      "fail"
     ]
   }
 }

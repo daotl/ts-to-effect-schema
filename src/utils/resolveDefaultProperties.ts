@@ -18,7 +18,7 @@ export function resolveDefaultProperties(sourceText: string) {
   const removeOptionalTransformer: ts.TransformerFactory<ts.SourceFile> = (
     context,
   ) => {
-    const visit: ts.Visitor = (node) => {
+    const visit: ts.Visitor<ts.Node, ts.Node> = (node) => {
       node = ts.visitEachChild(node, visit, context)
 
       if (ts.isPropertySignature(node)) {
@@ -38,7 +38,12 @@ export function resolveDefaultProperties(sourceText: string) {
       return node
     }
 
-    return (node) => ts.visitNode(node, visit, ts.isSourceFile)!
+    return (node) =>
+      ts.visitNode<ts.SourceFile, ts.Node, ts.SourceFile>(
+        node,
+        visit,
+        ts.isSourceFile,
+      )
   }
 
   const outputFile = ts.transform(sourceFile, [removeOptionalTransformer])

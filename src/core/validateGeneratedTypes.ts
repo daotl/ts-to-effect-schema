@@ -1,4 +1,3 @@
-import fs from 'fs'
 import {
   createDefaultMapFromNodeModules,
   createFSBackedSystem,
@@ -55,8 +54,6 @@ export function validateGeneratedTypes({
     ts,
     compilerOptions,
   )
-
-  fs.writeFileSync('./test.txt', integrationTests.sourceText)
 
   // Get the diagnostic
   const errors: ts.Diagnostic[] = []

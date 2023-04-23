@@ -140,7 +140,11 @@ class TsToEffect extends Command {
       return
     }
 
-    const fileConfig = await this.loadFileConfig(config, flags, configExt!)
+    const fileConfig = await this.loadFileConfig(
+      config,
+      flags,
+      configExt as ConfigExt,
+    )
 
     if (Array.isArray(fileConfig)) {
       if (args.input || args.output) {
