@@ -19,7 +19,7 @@
     "ts-to-effect-schema": "bin/run"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.package.json",
+    "build": "rimraf lib && tsc -p tsconfig.package.json",
     "prepublishOnly": "pnpm test:ci && rimraf lib && pnpm build",
     "lint": "npx rome format . && npx rome check .",
     "lint:fix": "npx rome format --write . && npx rome check --apply .",
@@ -47,6 +47,8 @@
     "@effect/io": "^0.24.2",
     "@effect/schema": "^0.14.1",
     "@oclif/core": "^2.8.2",
+    "@oclif/plugin-help": "^5.2.9",
+    "@oclif/plugin-plugins": "^2.4.6",
     "@typescript/vfs": "^1.3.5",
     "async": "^3.2.0",
     "case": "^1.6.3",
@@ -82,6 +84,7 @@
     "codecov": "^3.8.1",
     "husky": "^5.2.0",
     "jest": "^27.5.1",
+    "oclif": "^3",
     "pretty-quick": "^3.1.0",
     "rimraf": "^3.0.2",
     "rome": "^12.0.0",
@@ -100,6 +103,14 @@
     "trailingComma": "es5"
   },
   "oclif": {
-    "bin": "ts-to-zod"
+    "bin": "ts-to-effect-schema",
+    "dirname": "ts-to-effect-schema",
+    "commands": "./lib/commands",
+    "default": "generated",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins"
+    ],
+    "topicSeparator": " "
   }
 }

@@ -8,27 +8,27 @@ import { readFile, outputFile, existsSync } from 'fs-extra'
 import { join, relative, parse } from 'path'
 import slash from 'slash'
 import ts from 'typescript'
-import { generate, GenerateProps } from './core/generate'
-import { TsToEffectConfig, Config } from './config'
+import { generate, GenerateProps } from '../core/generate'
+import { TsToEffectConfig, Config } from '../config'
 import {
   tsToEffectConfigSchema,
   // getSchemaNameSchema,
   // nameFilterSchema,
-} from './config.schema'
-import { getImportPath } from './utils/getImportPath'
+} from '../config.schema'
+import { getImportPath } from '../utils/getImportPath'
 import ora from 'ora'
 import prettier from 'prettier'
-import * as worker from './worker'
+import * as worker from '../worker'
 import inquirer from 'inquirer'
 import { eachSeries } from 'async'
-import { createConfig } from './createConfig'
+import { createConfig } from '../createConfig'
 import chokidar from 'chokidar'
 import * as S from '@effect/schema/Schema'
 
 type ConfigExt = '.js' | '.cjs'
 
 // Try to load `ts-to-effect-schema.config.js`
-// We are doing this here to be able to infer the `flags` & `usage` in the cli help
+// We are doing this here to be able to infer the `flags` & `usage` in the index help
 const tsToEffectConfig = 'ts-to-effect-schema.config'
 const configPath = join(process.cwd(), tsToEffectConfig)
 let config: TsToEffectConfig | undefined
@@ -114,9 +114,7 @@ class TsToEffect extends Command {
       default: false,
       description: 'Watch input file(s) for changes and re-run related task',
     }),
-    config: Flags.custom({
-      multiple: true,
-    })({ char: 'c', options: configKeys, description: 'Execute one config', hidden: !haveMultiConfig, }),
+    config: Flags.string({ char: 'c', options: configKeys, description: 'Execute one config', hidden: !haveMultiConfig, }),
     // -- Multi config flags --
     // config: Flags.enum({
     //   char: 'c',
@@ -181,7 +179,7 @@ class TsToEffect extends Command {
         : fileConfig?.input || args.input
 
       this.log('\nWatching for changes…')
-      chokidar.watch(inputs).on('change', async (path) => {
+      chokidar.watch(inputs as string).on('change', async (path) => {
         console.clear()
         this.log(`Changes detected in "${slash(path)}"`)
         const config = Array.isArray(fileConfig)
