@@ -74,11 +74,11 @@ class TsToEffect extends Command {
 
   static usage = haveMultiConfig
     ? [
-      '--all',
-      ...configKeys.map(
-        (key) => `--config ${key.includes(' ') ? `"${key}"` : key}`,
-      ),
-    ]
+        '--all',
+        ...configKeys.map(
+          (key) => `--config ${key.includes(' ') ? `"${key}"` : key}`,
+        ),
+      ]
     : undefined
 
   static flags = {
@@ -114,7 +114,12 @@ class TsToEffect extends Command {
       default: false,
       description: 'Watch input file(s) for changes and re-run related task',
     }),
-    config: Flags.string({ char: 'c', options: configKeys, description: 'Execute one config', hidden: !haveMultiConfig, }),
+    config: Flags.string({
+      char: 'c',
+      options: configKeys,
+      description: 'Execute one config',
+      hidden: !haveMultiConfig,
+    }),
     // -- Multi config flags --
     // config: Flags.enum({
     //   char: 'c',
@@ -138,7 +143,7 @@ class TsToEffect extends Command {
   async run() {
     const { args, flags } = await this.parse(TsToEffect)
     if (flags.init) {
-      ; (await createConfig(configPath))
+      ;(await createConfig(configPath))
         ? this.log('🧐 ts-to-effect-schema.config.js created!')
         : this.log('Nothing changed!')
       return
@@ -339,12 +344,12 @@ See more help with --help`,
         prettier.format(
           hasExtensions(generateOptions.inferredTypes, javascriptExtensions)
             ? ts.transpileModule(effectInferredTypesFile, {
-              compilerOptions: {
-                target: ts.ScriptTarget.Latest,
-                module: ts.ModuleKind.ESNext,
-                newLine: ts.NewLineKind.LineFeed,
-              },
-            }).outputText
+                compilerOptions: {
+                  target: ts.ScriptTarget.Latest,
+                  module: ts.ModuleKind.ESNext,
+                  newLine: ts.NewLineKind.LineFeed,
+                },
+              }).outputText
             : effectInferredTypesFile,
           { parser: 'babel-ts', ...prettierConfig },
         ),

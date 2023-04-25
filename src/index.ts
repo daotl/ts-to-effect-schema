@@ -13,5 +13,4 @@
 // export { generateIntegrationTests } from './core/generateIntegrationTests'
 
 // export { TsToEffectConfig } from './config'
-export {run} from '@oclif/core'
-
+export { run } from '@oclif/core'

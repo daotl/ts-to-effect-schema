@@ -347,7 +347,7 @@ ${
     : ''
 }${
   usedSchemaNames.includes('lazy')
-  ? `\ntype BuiltIns =
+    ? `\ntype BuiltIns =
   | null
   | undefined
   | string
@@ -371,7 +371,7 @@ type ReplaceTypeDeep<ValueType, FromType, ToType> = ValueType extends BuiltIns
         ToType
       >;
     };\n`
-  : ''
+    : ''
 }
 ${Array.from(statements.values())
   .map((statement) => print(statement.value))
