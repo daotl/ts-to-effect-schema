@@ -453,8 +453,7 @@ function buildEffectSchemaPrimitive({
           keys.types.map((type) => {
             if (!ts.isLiteralTypeNode(type)) {
               throw new Error(
-                `${identifierName}<T, K> unknown syntax: (${
-                  ts.SyntaxKind[type.kind]
+                `${identifierName}<T, K> unknown syntax: (${ts.SyntaxKind[type.kind]
                 } as K union part not supported)`,
               )
             }
@@ -467,8 +466,7 @@ function buildEffectSchemaPrimitive({
       }
       if (!parameters) {
         throw new Error(
-          `${identifierName}<T, K> unknown syntax: (${
-            ts.SyntaxKind[keys.kind]
+          `${identifierName}<T, K> unknown syntax: (${ts.SyntaxKind[keys.kind]
           } as K not supported)`,
         )
       }
@@ -771,8 +769,7 @@ function buildEffectSchemaPrimitive({
   }
 
   console.warn(
-    ` »   Warning: '${
-      ts.SyntaxKind[typeNode.kind]
+    ` »   Warning: '${ts.SyntaxKind[typeNode.kind]
     }' is not supported, fallback into 'z.any()'`,
   )
   return buildEffectSchema(S, 'any', [], effectSchemaProperties)
@@ -812,31 +809,20 @@ function buildEffectSchemaExtendedSchema(
   properties?: EffectSchemaProperty[],
 ) {
   let effectSchemaCall = f.createIdentifier(schemaList[0]) as ts.Expression
-
   for (let i = 1; i < schemaList.length; i++) {
-    effectSchemaCall = f.createCallExpression(
-      f.createPropertyAccessExpression(
-        effectSchemaCall,
-        f.createIdentifier('extend'),
-      ),
-      undefined,
-      [
-        callCreateCallExpression(S, 'getPropertySignatures', undefined, [
-          f.createIdentifier(schemaList[i]),
-        ]),
-      ],
-    )
+    effectSchemaCall = callPipe(undefined, [
+      effectSchemaCall,
+      callCreateCallExpression(S, 'extend', undefined, [
+        f.createIdentifier(schemaList[i]),
+      ]),
+    ])
   }
 
   if (args?.length) {
-    effectSchemaCall = f.createCallExpression(
-      f.createPropertyAccessExpression(
-        effectSchemaCall,
-        f.createIdentifier('extend'),
-      ),
-      undefined,
-      args,
-    )
+    effectSchemaCall =  callPipe(undefined, [
+      effectSchemaCall,
+      callCreateCallExpression(S, 'extend', undefined, args),
+    ])
   }
 
   return withEffectSchemaProperties(S, effectSchemaCall, properties)
@@ -864,8 +850,8 @@ function withEffectSchemaProperties(
       const optionalExpression = isOptional
         ? expressionWithProperties
         : callCreateCallExpression(s, 'optional', undefined, [
-            expressionWithProperties,
-          ])
+          expressionWithProperties,
+        ])
 
       return callCreatePropertyAccessExpression(
         optionalExpression,
@@ -889,9 +875,9 @@ function withEffectSchemaProperties(
       // Reduce unnecessary "pipe"
       return ex.expression.escapedText === 'pipe'
         ? {
-            ...expressionWithProperties,
-            arguments: [...ex.arguments, e],
-          }
+          ...expressionWithProperties,
+          arguments: [...ex.arguments, e],
+        }
         : callPipe(undefined, [expressionWithProperties, e])
     }
 
@@ -946,13 +932,13 @@ function buildEffectSchemaObject({
   const parsedProperties =
     properties.length > 0
       ? buildEffectSchemaProperties({
-          members: properties,
-          schemaImportValue: S,
-          sourceFile,
-          dependencies,
-          getDependencyName,
-          skipParseJSDoc,
-        })
+        members: properties,
+        schemaImportValue: S,
+        sourceFile,
+        dependencies,
+        getDependencyName,
+        skipParseJSDoc,
+      })
       : new Map()
 
   if (schemaExtensionClauses && schemaExtensionClauses.length > 0) {
@@ -961,13 +947,15 @@ function buildEffectSchemaObject({
       schemaExtensionClauses,
       properties.length > 0
         ? [
+          callCreateCallExpression(S, 'struct',undefined, [
             f.createObjectLiteralExpression(
               Array.from(parsedProperties.entries()).map(([key, tsCall]) => {
                 return f.createPropertyAssignment(key, tsCall)
               }),
               true,
-            ),
-          ]
+            )
+          ]),
+        ]
         : undefined,
     )
   } else if (properties.length > 0) {
@@ -1054,7 +1042,7 @@ function buildSchemaReference(
           (ts.isInterfaceDeclaration(n) || ts.isTypeAliasDeclaration(n)) &&
           ts.isIndexedAccessTypeNode(node.objectType) &&
           n.name.getText(sourceFile) ===
-            node.objectType.objectType.getText(sourceFile).split('[')[0]
+          node.objectType.objectType.getText(sourceFile).split('[')[0]
         )
       },
     )
@@ -1063,11 +1051,11 @@ function buildSchemaReference(
       const key = node.objectType.indexType.getText(sourceFile).slice(1, -1) // remove quotes
       const members =
         ts.isTypeAliasDeclaration(declaration) &&
-        ts.isTypeLiteralNode(declaration.type)
+          ts.isTypeLiteralNode(declaration.type)
           ? declaration.type.members
           : ts.isInterfaceDeclaration(declaration)
-          ? declaration.members
-          : []
+            ? declaration.members
+            : []
 
       const member = members.find((m) => m.name?.getText(sourceFile) === key)
 
@@ -1155,11 +1143,11 @@ function buildSchemaReference(
 
     return path
       ? f.createPropertyAccessExpression(
-          callCreateCallExpression('S', 'getPropertySignatures', undefined, [
-            e,
-          ]),
-          f.createIdentifier(path.slice(0, -1)),
-        )
+        callCreateCallExpression('S', 'getPropertySignatures', undefined, [
+          e,
+        ]),
+        f.createIdentifier(path.slice(0, -1)),
+      )
       : e
   }
 

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "rootDir": "src",
     "outDir": "lib",
     "target": "es2017",
     "allowSyntheticDefaultImports": true,

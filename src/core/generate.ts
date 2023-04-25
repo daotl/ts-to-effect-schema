@@ -331,7 +331,8 @@ ${Array.from(effectSchemasWithMissingDependencies).join('\n')}`,
 import * as S from "@effect/schema/Schema";
 ${
   usedSchemaNames.includes('lazy')
-    ? 'import type { ReadonlyDeep } from "type-fest";\n'
+    ? `import type { ReadonlyDeep } from "type-fest";
+    import type { BuiltIns } from "type-fest/source/internal";`
     : ''
 }${
   usedSchemaNames.includes('pipe')
@@ -345,6 +346,18 @@ ${
   valueImports.length
     ? `import { ${valueImports.join(', ')} } from "${typesImportPath}";\n`
     : ''
+}${
+  usedSchemaNames.includes('lazy')
+  ? `\ntype ReplaceType<ValueType, FromType, ToType> = ValueType extends FromType
+  ? ToType
+  : ValueType;
+
+type ReplaceTypeDeep<ValueType, FromType, ToType> = ValueType extends BuiltIns
+  ? ReplaceType<ValueType, FromType, ToType>
+  : {
+    [KeyType in keyof ValueType]: ReplaceTypeDeep<ValueType[KeyType], FromType, ToType>
+  };\n`
+  : ''
 }
 ${Array.from(statements.values())
   .map((statement) => print(statement.value))

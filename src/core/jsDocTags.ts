@@ -223,14 +223,14 @@ export function jsDocTagToEffectSchemaProperties(
       expressions: [f.createRegularExpressionLiteral(`/${jsDocTags.pattern}/`)],
     })
   }
-  if (isOptional) {
-    effectSchemaProperties.push({
-      identifier: 'optional',
-    })
-  }
   if (isNullable) {
     effectSchemaProperties.push({
       identifier: 'nullable',
+    })
+  }
+  if (isOptional) {
+    effectSchemaProperties.push({
+      identifier: 'optional',
     })
   }
   if (isPartial) {

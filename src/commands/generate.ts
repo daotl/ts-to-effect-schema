@@ -270,7 +270,6 @@ See more help with --help`,
     if (typeof flags.inferredTypes === 'string') {
       generateOptions.inferredTypes = flags.inferredTypes
     }
-
     const {
       errors,
       transformedSourceText,
