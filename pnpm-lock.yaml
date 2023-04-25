@@ -50,7 +50,6 @@ specifiers:
   tsutils: ^3.21.0
   type-fest: ^3.8.0
   typescript: 5.0.4
-  zod: ^3.11.6
 
 dependencies:
   '@effect/data': 0.12.2
@@ -75,7 +74,6 @@ dependencies:
   tslib: 2.5.0
   tsutils: 3.21.0_typescript@5.0.4
   typescript: 5.0.4
-  zod: 3.21.4
 
 devDependencies:
   '@babel/core': 7.21.4
@@ -7294,7 +7292,3 @@ packages:
       taketalk: 1.0.0
       wrap-ansi: 2.1.0
     dev: true
-
-  /zod/3.21.4:
-    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
-    dev: false
