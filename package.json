@@ -1,7 +1,7 @@
 {
   "name": "ts-to-effect-schema",
   "description": "Generate @effect/schema schemas from TypeScript types/interfaces",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/daotl/ts-to-effect-schema",
   "bugs": "https://github.com/daotl/ts-to-effect-schema/issues",
   "repository": "daotl/ts-to-effect-schema",
@@ -20,7 +20,6 @@
   },
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.package.json",
-    "prepublishOnly": "pnpm test:ci && rimraf lib && pnpm build",
     "lint": "npx rome format . && npx rome check .",
     "lint:fix": "npx rome format --write . && npx rome check --apply .",
     "test": "jest",
