@@ -20,13 +20,14 @@
   },
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.package.json",
+    "prepublishOnly": "pnpm test && rimraf lib && pnpm build",
     "lint": "npx rome format . && npx rome check .",
     "lint:fix": "npx rome format --write . && npx rome check --apply .",
     "test": "jest",
     "test:ci": "jest --ci --coverage && pnpm gen:all && tsc --noEmit",
-    "gen:all": "./bin/dev --all",
-    "gen:example": "./bin/dev --config example",
-    "gen:config": "./bin/dev --config config"
+    "gen:all": "./bin/run --all",
+    "gen:example": "./bin/run --config example",
+    "gen:config": "./bin/run --config config"
   },
   "files": [
     "LICENSE",
@@ -47,7 +48,6 @@
     "@effect/schema": "^0.17.2",
     "@oclif/core": "^2.8.2",
     "@oclif/plugin-help": "^5.2.9",
-    "@oclif/plugin-plugins": "^2.4.7",
     "@typescript/vfs": "^1.4.0",
     "async": "^3.2.4",
     "case": "^1.6.3",
@@ -106,8 +106,7 @@
     "commands": "./lib/commands",
     "default": "generate",
     "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-plugins"
+      "@oclif/plugin-help"
     ],
     "topicSeparator": " "
   }

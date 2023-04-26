@@ -87,7 +87,7 @@ export function generateSchemaVariableStatement({
 
   if (!node) {
     if (standardBuiltInObjects.includes(typeName as string)) {
-      schema = buildEffectSchema(schemaImportValue, 'instanceof', [
+      schema = buildEffectSchema(schemaImportValue, 'instanceOf', [
         f.createIdentifier(typeName as string),
       ])
       requiresImport = false
@@ -773,7 +773,7 @@ function buildEffectSchemaPrimitive({
   console.warn(
     ` »   Warning: '${
       ts.SyntaxKind[typeNode.kind]
-    }' is not supported, fallback into 'z.any()'`,
+    }' is not supported, fallback into 'any'`,
   )
   return buildEffectSchema(S, 'any', [], effectSchemaProperties)
 }
