@@ -36,6 +36,7 @@ export interface Villain {
 }
 
 export interface EvilPlan {
+  date: Date
   owner: Villain
   description: string
   details: EvilPlanDetails

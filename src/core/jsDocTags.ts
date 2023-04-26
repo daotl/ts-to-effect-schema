@@ -175,7 +175,7 @@ export function jsDocTagToEffectSchemaProperties(
   const effectSchemaProperties: EffectSchemaProperty[] = []
   if (jsDocTags.minimum !== undefined) {
     effectSchemaProperties.push({
-      identifier: 'lessThan',
+      identifier: 'greaterThanOrEqualTo',
       expressions: withErrorMessage(
         f.createNumericLiteral(jsDocTags.minimum.value),
         jsDocTags.minimum.errorMessage,
@@ -184,7 +184,7 @@ export function jsDocTagToEffectSchemaProperties(
   }
   if (jsDocTags.maximum !== undefined) {
     effectSchemaProperties.push({
-      identifier: 'greaterThan',
+      identifier: 'lessThanOrEqualTo',
       expressions: withErrorMessage(
         f.createNumericLiteral(jsDocTags.maximum.value),
         jsDocTags.maximum.errorMessage,

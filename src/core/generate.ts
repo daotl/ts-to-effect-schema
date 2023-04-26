@@ -331,7 +331,7 @@ ${Array.from(effectSchemasWithMissingDependencies).join('\n')}`,
 import * as S from "@effect/schema/Schema";
 ${
   usedSchemaNames.includes('lazy')
-    ? `import type { ReadonlyDeep } from "type-fest";`
+    ? `import type { Primitive, ReadonlyDeep } from "type-fest";`
     : ''
 }${
   usedSchemaNames.includes('pipe')
@@ -347,30 +347,23 @@ ${
     : ''
 }${
   usedSchemaNames.includes('lazy')
-    ? `\ntype BuiltIns =
-  | null
-  | undefined
-  | string
-  | number
-  | boolean
-  | symbol
-  | bigint
-  | Date
-  | RegExp;
+    ? `\n// https://github.com/sindresorhus/type-fest/blob/2f64161921fc5e2d8e29d36ddaf2dc082017de35/source/internal.d.ts#L35
+        export type BuiltIns = Primitive | Date | RegExp;
 
-type ReplaceType<ValueType, FromType, ToType> = ValueType extends FromType
-  ? ToType
-  : ValueType;
+    export type ReplaceType<T, From, To> = T extends From ? To : T;
 
-type ReplaceTypeDeep<ValueType, FromType, ToType> = ValueType extends BuiltIns
-  ? ReplaceType<ValueType, FromType, ToType>
-  : {
-      [KeyType in keyof ValueType]: ReplaceTypeDeep<
-        ValueType[KeyType],
-        FromType,
-        ToType
-      >;
-    };\n`
+    export type ReplaceTypeDeep<T, From, To> = T extends BuiltIns
+      ? ReplaceType<T, From, To>
+      : {
+          [K in keyof T]: ReplaceTypeDeep<T[K], From, To>;
+        };
+    
+    export type ReplaceDateToStringDeep<T> = ReplaceTypeDeep<T, Date, string>;
+    
+    export type ObjectSchema<T extends Object> = S.Schema<
+      ReplaceDateToStringDeep<ReadonlyDeep<T>>,
+      ReadonlyDeep<T>
+    >;\n`
     : ''
 }
 ${Array.from(statements.values())

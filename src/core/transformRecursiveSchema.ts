@@ -25,17 +25,8 @@ export function transformRecursiveSchema(
         f.createVariableDeclaration(
           declaration.name,
           undefined,
-          f.createTypeReferenceNode(`${effectImportValue}.Schema`, [
-            f.createTypeReferenceNode('ReplaceTypeDeep', [
-              f.createTypeReferenceNode('ReadonlyDeep', [
-                f.createTypeReferenceNode(typeName),
-              ]),
-              f.createTypeReferenceNode('Date'),
-              f.createTypeReferenceNode('string'),
-            ]),
-            f.createTypeReferenceNode('ReadonlyDeep', [
-              f.createTypeReferenceNode(typeName),
-            ]),
+          f.createTypeReferenceNode('ObjectSchema', [
+            f.createTypeReferenceNode(typeName),
           ]),
           f.createCallExpression(
             f.createPropertyAccessExpression(
