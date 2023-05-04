@@ -1,3 +1,5 @@
+import { unknown } from "@effect/schema/Schema"
+
 export enum EnemyPower {
   Flight = 'flight',
   Strength = 'strength',
@@ -33,6 +35,7 @@ export interface Villain {
   powers: EnemyPower[]
   friends: Villain[]
   canBeTrusted: never
+  age: unknown
 }
 
 export interface EvilPlan {
@@ -95,44 +98,44 @@ export interface Exported {
 //   withKryptonite?: boolean,
 // ) => string
 
-export interface HeroContact {
-  /**
-   * The email of the hero.
-   *
-   * @pattern ^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$
-   */
-  email: string
+// export interface HeroContact {
+//   /**
+//    * The email of the hero.
+//    *
+//    * @pattern ^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$
+//    */
+//   email: string
 
-  /**
-   * The name of the hero.
-   *
-   * @minLength 2
-   * @maxLength 50
-   */
-  name: string
+//   /**
+//    * The name of the hero.
+//    *
+//    * @minLength 2
+//    * @maxLength 50
+//    */
+//   name: string
 
-  /**
-   * The phone number of the hero.
-   *
-   * @pattern ^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$
-   */
-  phoneNumber: string
+//   /**
+//    * The phone number of the hero.
+//    *
+//    * @pattern ^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$
+//    */
+//   phoneNumber: string
 
-  /**
-   * Does the hero has super power?
-   *
-   * @default true
-   */
-  hasSuperPower?: boolean
+//   /**
+//    * Does the hero has super power?
+//    *
+//    * @default true
+//    */
+//   hasSuperPower?: boolean
 
-  /**
-   * The age of the hero
-   *
-   * @minimum 0
-   * @maximum 500
-   */
-  age: number
-}
+//   /**
+//    * The age of the hero
+//    *
+//    * @minimum 0
+//    * @maximum 500
+//    */
+//   age: number
+// }
 
 interface Person {
   name: string
@@ -142,4 +145,14 @@ interface Info {
   age: number
 }
 
-export type Jim = Person & Info
+// export type Jim = Person & Info
+ export interface pipe {
+  name: 'pipe'
+  pipe: () => string
+}
+
+// const pipe: pipe = {
+//   name: 'pipe',
+//   pipe: () => 'pipe'
+// }
+
