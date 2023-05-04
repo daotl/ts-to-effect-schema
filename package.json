@@ -1,7 +1,7 @@
 {
   "name": "ts-to-effect-schema",
   "description": "Generate @effect/schema schemas from TypeScript types/interfaces",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "homepage": "https://github.com/daotl/ts-to-effect-schema",
   "bugs": "https://github.com/daotl/ts-to-effect-schema/issues",
   "repository": "daotl/ts-to-effect-schema",
@@ -32,7 +32,6 @@
   "files": [
     "LICENSE",
     "README.md",
-    "ts-to-effect-schema-logo.svg",
     "lib",
     "bin"
   ],
