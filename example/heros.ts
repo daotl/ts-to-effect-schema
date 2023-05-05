@@ -1,158 +1,157 @@
-import { unknown } from "@effect/schema/Schema"
-
 export enum EnemyPower {
-  Flight = 'flight',
-  Strength = 'strength',
-  Speed = 'speed',
+  Flight = "flight",
+  Strength = "strength",
+  Speed = "speed",
 }
 
 export namespace Skills {
   export type SpeedEnemy = {
-    power: EnemyPower.Speed
-  }
+    power: EnemyPower.Speed;
+  };
 }
 
 export interface Enemy {
-  name: string
-  powers: EnemyPower[]
-  inPrison: boolean
+  name: string;
+  powers: EnemyPower[];
+  inPrison: boolean;
 }
 
-export type SupermanEnemy = Superman['enemies'][-1]
-export type SupermanName = Superman['name']
-export type SupermanInvinciblePower = Superman['powers'][2]
+export type SupermanEnemy = Superman["enemies"][-1];
+export type SupermanName = Superman["name"];
+export type SupermanInvinciblePower = Superman["powers"][2];
 
 export interface Superman {
-  name: 'superman' | 'clark kent' | 'kal-l'
-  enemies: Record<string, Enemy>
-  age: number
-  underKryptonite?: boolean
-  powers: ['fly', 'laser', 'invincible']
+  name: "superman" | "clark kent" | "kal-l";
+  enemies: Record<string, Enemy>;
+  age: number;
+  underKryptonite?: boolean;
+  powers: ["fly", "laser", "invincible"];
 }
 
 export interface Villain {
-  name: string
-  powers: EnemyPower[]
-  friends: Villain[]
-  canBeTrusted: never
-  age: unknown
+  name: string;
+  powers: EnemyPower[];
+  friends: Villain[];
+  canBeTrusted: never;
+  age: unknown;
 }
 
 export interface EvilPlan {
-  date: Date
-  owner: Villain
-  description: string
-  details: EvilPlanDetails
+  date: Date;
+  owner: Villain;
+  description: string;
+  details: EvilPlanDetails;
 }
 
 export interface EvilPlanDetails {
-  parent: EvilPlan // <- Unsolvable circular reference
-  steps: string[]
+  parent: EvilPlan; // <- Unsolvable circular reference
+  // steps: string[]
+  u: Uint8Array;
 }
 
-export type Story = [subject: string, problems: string[]]
-export type KrytonResponse = Promise<boolean>
+export type Story = [subject: string, problems: string[]];
+export type KrytonResponse = Promise<boolean>;
 export type KillSuperman = (
   withKryptonite: boolean,
-  method: string,
-) => Promise<boolean>
+  method: string
+) => Promise<boolean>;
 
 export interface WithDefaults {
   /**
    * @default 42
    */
-  theAnswerToTheUltimateQuestionOfLife: number
+  theAnswerToTheUltimateQuestionOfLife: number;
   /**
    * @default false
    */
-  isVulnerable: boolean
+  isVulnerable: boolean;
   /**
    * @default clark
    */
-  name: 'clark' | 'superman' | 'kal-l'
+  name: "clark" | "superman" | "kal-l";
   /**
    * @default The Answer to the Ultimate Question of Life
    */
-  theMeaningOf42: string
+  theMeaningOf42: string;
   /**
    * @default ""
    */
-  emptyString?: string
+  emptyString?: string;
   /**
    * @default "true"
    */
-  booleanAsString: string
+  booleanAsString: string;
 }
 
 interface NonExported {
-  name: string
+  name: string;
 }
 
 export interface Exported {
-  a: NonExported
-  b: string
+  a: NonExported;
+  b: string;
 }
 
-// export type GetSupermanSkill = (
-//   skillName: string,
-//   withKryptonite?: boolean,
-// ) => string
+export type GetSupermanSkill = (
+  skillName: string,
+  withKryptonite?: boolean,
+) => string
 
-// export interface HeroContact {
-//   /**
-//    * The email of the hero.
-//    *
-//    * @pattern ^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$
-//    */
-//   email: string
+export interface HeroContact {
+  /**
+   * The email of the hero.
+   *
+   * @pattern ^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$
+   */
+  email: string
 
-//   /**
-//    * The name of the hero.
-//    *
-//    * @minLength 2
-//    * @maxLength 50
-//    */
-//   name: string
-
-//   /**
-//    * The phone number of the hero.
-//    *
-//    * @pattern ^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$
-//    */
-//   phoneNumber: string
-
-//   /**
-//    * Does the hero has super power?
-//    *
-//    * @default true
-//    */
-//   hasSuperPower?: boolean
-
-//   /**
-//    * The age of the hero
-//    *
-//    * @minimum 0
-//    * @maximum 500
-//    */
-//   age: number
-// }
-
-interface Person {
+  /**
+   * The name of the hero.
+   *
+   * @minLength 2
+   * @maxLength 50
+   */
   name: string
-}
 
-interface Info {
+  /**
+   * The phone number of the hero.
+   *
+   * @pattern ^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$
+   */
+  phoneNumber: string
+
+  /**
+   * Does the hero has super power?
+   *
+   * @default true
+   */
+  hasSuperPower?: boolean
+
+  /**
+   * The age of the hero
+   *
+   * @minimum 0
+   * @maximum 500
+   */
   age: number
 }
 
-// export type Jim = Person & Info
- export interface pipe {
-  name: 'pipe'
-  pipe: () => string
+interface Person {
+  name: string;
+  organizationLicensePhoto?: Uint8Array | null;
 }
+
+interface Info {
+  age: number;
+}
+
+export type Jim = Person & Info;
+// export interface pipe {
+//   name: "pipe";
+//   pipe: () => string;
+// }
 
 // const pipe: pipe = {
 //   name: 'pipe',
 //   pipe: () => 'pipe'
 // }
-

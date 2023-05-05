@@ -21,7 +21,9 @@ export type WithDefaults = S.To<typeof generated.withDefaultsSchema>;
 
 export type Exported = S.To<typeof generated.exportedSchema>;
 
-export type pipe = S.To<typeof generated.pipeSchema>;
+export type GetSupermanSkill = S.To<typeof generated.getSupermanSkillSchema>;
+
+export type HeroContact = S.To<typeof generated.heroContactSchema>;
 
 export type SupermanEnemy = S.To<typeof generated.supermanEnemySchema>;
 
@@ -32,6 +34,8 @@ export type SupermanInvinciblePower = S.To<
 >;
 
 export type KrytonResponse = S.To<typeof generated.krytonResponseSchema>;
+
+export type Jim = S.To<typeof generated.jimSchema>;
 
 export type EvilPlan = S.To<typeof generated.evilPlanSchema>;
 
