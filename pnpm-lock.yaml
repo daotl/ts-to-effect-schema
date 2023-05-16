@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 overrides:
   '@effect/data': ^0.12.2
   '@effect/io': ^0.25.5
-  '@effect/schema': ^0.17.2
+  '@effect/schema': ^0.19.0
 
 specifiers:
   '@babel/core': ^7.21.4
@@ -12,7 +12,7 @@ specifiers:
   '@daotl/rome-config': 0.0.1-alpha.4
   '@effect/data': ^0.12.2
   '@effect/io': ^0.25.5
-  '@effect/schema': ^0.17.2
+  '@effect/schema': ^0.19.0
   '@oclif/core': ^2.8.2
   '@oclif/plugin-help': ^5.2.9
   '@types/async': ^3.2.19
@@ -53,7 +53,7 @@ specifiers:
 dependencies:
   '@effect/data': 0.12.2
   '@effect/io': 0.25.7
-  '@effect/schema': 0.17.2
+  '@effect/schema': 0.19.0
   '@oclif/core': 2.8.2_37cl5ouahn3p3uoosme6w742uy
   '@oclif/plugin-help': 5.2.9_37cl5ouahn3p3uoosme6w742uy
   '@typescript/vfs': 1.4.0
@@ -1354,8 +1354,8 @@ packages:
       '@effect/data': 0.12.2
     dev: false
 
-  /@effect/schema/0.17.2:
-    resolution: {integrity: sha512-HcXZBGtPzhuX/RnIkaVIlYGp1ThuAyl34YNhxrhUQ8TdOnRFkx3tAbmXYpkWkrlo92Ou+/Z0ZixEaSFn7x2shw==}
+  /@effect/schema/0.19.0:
+    resolution: {integrity: sha512-BCmDLvFJol1uAyCJbCi+Ss0HFf+k/qb4tyvc8Iu4O/7ChNnBiACDWukU3f+7lHZPIh729arzdBoBSQqyKX64iw==}
     dependencies:
       '@effect/data': 0.12.2
       '@effect/io': 0.25.7

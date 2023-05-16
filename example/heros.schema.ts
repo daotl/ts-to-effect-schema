@@ -6,7 +6,9 @@ import type {
   IsAny,
   IsUnknown,
   IsEqual,
+  IsEmptyObject,
 } from "type-fest";
+import * as AST from "@effect/schema/AST";
 import { pipe } from "@effect/data/Function";
 import type { Villain, EvilPlan, EvilPlanDetails } from "./heros";
 import { EnemyPower } from "./heros";
@@ -34,6 +36,59 @@ export type ObjectSchema<T extends Object> = S.Schema<
   ReplaceDateToStringDeep<ReadonlyDeep<T>>,
   ReadonlyDeep<T>
 >;
+
+export const getPropertySignatures = <I extends { [K in keyof A]: any }, A>(
+  schema: S.Schema<I, A>
+): { [K in keyof A]: S.Schema<I[K], A[K]> } => {
+  const out: Record<PropertyKey, S.Schema<any>> = {};
+  const propertySignatures = AST.getPropertySignatures(schema.ast);
+  for (let i = 0; i < propertySignatures.length; i++) {
+    const propertySignature = propertySignatures[i];
+    out[propertySignature.name] = S.make(propertySignature.type);
+  }
+  return out as any;
+};
+
+export type CommonKey<T, U, TK = keyof T, UK = keyof U> = {
+  // @ts-expect-error
+  [P in TK extends UK ? TK : never]: T[P];
+};
+
+const omitCommonProperties = <
+  I extends { [K in keyof A]: unknown },
+  A,
+  IB extends { [K in keyof B]: unknown },
+  B,
+  R = IsEmptyObject<CommonKey<A, B>> extends true
+    ? S.Schema<I, A>
+    : S.Schema<I, Omit<A, keyof CommonKey<A, B>>>
+>(
+  self: S.Schema<I, A>,
+  that: S.Schema<IB, B>
+): R => {
+  const selfObj = getPropertySignatures(self);
+  const thatObj = getPropertySignatures(that);
+
+  const intersections = Object.keys(selfObj).reduce<(keyof A)[]>(
+    (keys, key) => {
+      if (Reflect.has(thatObj, key)) {
+        keys.push(key as keyof A);
+      }
+
+      return keys;
+    },
+    []
+  ) as unknown as (keyof CommonKey<A, B>)[];
+
+  if (intersections.length) {
+    return pipe(
+      self,
+      S.omit<A, (keyof CommonKey<A, B>)[]>(...intersections)
+    ) as unknown as R;
+  }
+
+  return self as unknown as R;
+};
 
 export const enemyPowerSchema = S.enums(EnemyPower);
 
@@ -128,12 +183,12 @@ const uint8ArraySchema = S.instanceOf(Uint8Array);
 const promiseSchema = S.instanceOf(Promise);
 
 export const supermanEnemySchema =
-  S.getPropertySignatures(supermanSchema).enemies;
+  getPropertySignatures(supermanSchema).enemies;
 
-export const supermanNameSchema = S.getPropertySignatures(supermanSchema).name;
+export const supermanNameSchema = getPropertySignatures(supermanSchema).name;
 
-export const supermanInvinciblePowerSchema = S.getPropertySignatures(
-  S.getPropertySignatures(supermanSchema).powers
+export const supermanInvinciblePowerSchema = getPropertySignatures(
+  getPropertySignatures(supermanSchema).powers
 )[2];
 
 export const krytonResponseSchema = promiseSchema;
@@ -143,7 +198,10 @@ const personSchema = S.struct({
   organizationLicensePhoto: S.optional(S.nullable(uint8ArraySchema)),
 });
 
-export const jimSchema = pipe(personSchema, S.extend(infoSchema));
+export const jimSchema = pipe(
+  personSchema,
+  S.extend(omitCommonProperties(infoSchema, personSchema))
+);
 
 export const evilPlanSchema: ObjectSchema<EvilPlan> = S.lazy(() =>
   S.struct({
