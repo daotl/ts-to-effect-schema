@@ -137,6 +137,11 @@ export interface HeroContact {
 }
 
 interface Person {
+  /**
+   * Does the hero has super power?
+   *
+   * @default "dddd"
+   */
   name: string
   organizationLicensePhoto?: Uint8Array | null
 }

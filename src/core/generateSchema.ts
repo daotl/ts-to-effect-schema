@@ -677,17 +677,21 @@ function buildEffectSchemaPrimitive({
               f.createIdentifier('omitCommonProperties'),
               undefined,
               [
-                buildEffectSchemaPrimitive({
-                  S,
-                  typeNode: node,
-                  isOptional: false,
-                  jsDocTags: {},
-                  sourceFile,
-                  dependencies,
-                  getDependencyName,
-                  skipParseJSDoc,
-                }),
-                intersectionSchema,
+                callCreateCallExpression(S, 'to', undefined, [
+                  buildEffectSchemaPrimitive({
+                    S,
+                    typeNode: node,
+                    isOptional: false,
+                    jsDocTags: {},
+                    sourceFile,
+                    dependencies,
+                    getDependencyName,
+                    skipParseJSDoc,
+                  }),
+                ]),
+                callCreateCallExpression(S, 'to', undefined, [
+                  intersectionSchema,
+                ]),
               ],
             ),
           ]),
@@ -826,7 +830,12 @@ function buildEffectSchemaExtendedSchema(
         f.createCallExpression(
           f.createIdentifier('omitCommonProperties'),
           undefined,
-          [f.createIdentifier(schemaList[i]), effectSchemaCall],
+          [
+            callCreateCallExpression(S, 'to', undefined, [
+              f.createIdentifier(schemaList[i]),
+            ]),
+            callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
+          ],
         ),
       ]),
     ])
@@ -839,7 +848,10 @@ function buildEffectSchemaExtendedSchema(
         f.createCallExpression(
           f.createIdentifier('omitCommonProperties'),
           undefined,
-          [...args, effectSchemaCall],
+          [
+            callCreateCallExpression(S, 'to', undefined, [...args]),
+            callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
+          ],
         ),
       ]),
     ])
@@ -1158,7 +1170,11 @@ function buildSchemaReference(
       f.createCallExpression(
         f.createIdentifier('getPropertySchemas'),
         undefined,
-        [f.createIdentifier(dependencyName)],
+        [
+          callCreateCallExpression('S', 'to', undefined, [
+            f.createIdentifier(dependencyName),
+          ]),
+        ],
       ),
       f.createIdentifier(indexTypeName),
     )
@@ -1168,7 +1184,7 @@ function buildSchemaReference(
           f.createCallExpression(
             f.createIdentifier('getPropertySchemas'),
             undefined,
-            [e],
+            [callCreateCallExpression('S', 'to', undefined, [e])],
           ),
           f.createIdentifier(path.slice(0, -1)),
         )
