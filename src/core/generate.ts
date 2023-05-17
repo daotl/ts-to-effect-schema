@@ -347,7 +347,7 @@ ${
     ? `import type { ${genTypeFestModule()} } from "type-fest";`
     : ''
 }${
-  usedSchemaNames.includes('getPropertySignatures') || usedSchemaNames.includes('extend')
+  usedSchemaNames.includes('getPropertySchemas') || usedSchemaNames.includes('extend')
     ? `import * as AST from '@effect/schema/AST';`
     : ''
 }${
@@ -389,13 +389,13 @@ ${
     >;\n`
     : ''
 }${
-  usedSchemaNames.includes('getPropertySignatures') || usedSchemaNames.includes('extend')
+  usedSchemaNames.includes('getPropertySchemas') || usedSchemaNames.includes('extend')
     ? `\n// https://github.com/Effect-TS/schema/releases/tag/v0.18.0
-    export const getPropertySignatures = <I extends { [K in keyof A]: any }, A>(
+    export const getPropertySchemas = <I extends { [K in keyof A]: any }, A>(
       schema: S.Schema<I, A>
     ): { [K in keyof A]: S.Schema<I[K], A[K]> } => {
       const out: Record<PropertyKey, S.Schema<any>> = {}
-      const propertySignatures = AST.getPropertySignatures(schema.ast)
+      const propertySignatures = AST.getPropertySchemas(schema.ast)
       for (let i = 0; i < propertySignatures.length; i++) {
         const propertySignature = propertySignatures[i]!
         out[propertySignature.name] = S.make(propertySignature.type)
@@ -422,8 +422,8 @@ ${
       self: S.Schema<I, A>,
       that: S.Schema<IB, B>
     ): R => {
-      const selfObj = getPropertySignatures(self);
-      const thatObj = getPropertySignatures(that);
+      const selfObj = getPropertySchemas(self);
+      const thatObj = getPropertySchemas(that);
 
       const intersections = Object.keys(selfObj).reduce<(keyof A)[]>(
         (keys, key) => {

@@ -1156,7 +1156,7 @@ function buildSchemaReference(
 
     const e = f.createPropertyAccessExpression(
       f.createCallExpression(
-        f.createIdentifier('getPropertySignatures'),
+        f.createIdentifier('getPropertySchemas'),
         undefined,
         [f.createIdentifier(dependencyName)],
       ),
@@ -1166,7 +1166,7 @@ function buildSchemaReference(
     return path
       ? f.createPropertyAccessExpression(
           f.createCallExpression(
-            f.createIdentifier('getPropertySignatures'),
+            f.createIdentifier('getPropertySchemas'),
             undefined,
             [e],
           ),

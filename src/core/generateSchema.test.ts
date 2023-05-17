@@ -471,7 +471,7 @@ describe("generateSchema", () => {
     const source = `export type SupermanName = Superman["name"]`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanNameSchema = getPropertySignatures(supermanSchema).name;"`
+      `"export const supermanNameSchema = getPropertySchemas(supermanSchema).name;"`
     );
   });
 
@@ -479,7 +479,7 @@ describe("generateSchema", () => {
     const source = `export type SupermanFlyPower = Superman["power"]["fly"]`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanFlyPowerSchema = getPropertySignatures(getPropertySignatures(supermanSchema).power).fly;"`
+      `"export const supermanFlyPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).power).fly;"`
     );
   });
 
@@ -491,7 +491,7 @@ describe("generateSchema", () => {
     };`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySignatures(getPropertySignatures(supermanSchema).powers).element;"`
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`
     );
   });
 
@@ -503,7 +503,7 @@ describe("generateSchema", () => {
     };`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySignatures(getPropertySignatures(supermanSchema).powers).element;"`
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`
     );
   });
 
@@ -515,7 +515,7 @@ describe("generateSchema", () => {
     };`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySignatures(supermanSchema).powers;"`
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`
     );
   });
 
@@ -527,7 +527,7 @@ describe("generateSchema", () => {
     };`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySignatures(supermanSchema).powers;"`
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`
     );
   });
 
@@ -539,7 +539,7 @@ describe("generateSchema", () => {
     };`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySignatures(getPropertySignatures(supermanSchema).powers).[1];"`
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).[1];"`
     );
   });
 
@@ -564,7 +564,7 @@ describe("generateSchema", () => {
     };`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySignatures(getPropertySignatures(supermanSchema).powers).element;"`
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`
     );
   });
 
@@ -576,7 +576,7 @@ describe("generateSchema", () => {
     };`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySignatures(getPropertySignatures(supermanSchema).powers).element;"`
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`
     );
   });
 
@@ -588,7 +588,7 @@ describe("generateSchema", () => {
     };`;
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySignatures(supermanSchema).powers;"`
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`
     );
   });
 
