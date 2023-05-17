@@ -390,7 +390,8 @@ ${
     : ''
 }${
   usedSchemaNames.includes('getPropertySignatures') || usedSchemaNames.includes('extend')
-    ? `\nexport const getPropertySignatures = <I extends { [K in keyof A]: any }, A>(
+    ? `\n// https://github.com/Effect-TS/schema/releases/tag/v0.18.0
+    export const getPropertySignatures = <I extends { [K in keyof A]: any }, A>(
       schema: S.Schema<I, A>
     ): { [K in keyof A]: S.Schema<I[K], A[K]> } => {
       const out: Record<PropertyKey, S.Schema<any>> = {}

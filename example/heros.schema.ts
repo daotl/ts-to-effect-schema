@@ -37,13 +37,14 @@ export type ObjectSchema<T extends Object> = S.Schema<
   ReadonlyDeep<T>
 >;
 
+// https://github.com/Effect-TS/schema/releases/tag/v0.18.0
 export const getPropertySignatures = <I extends { [K in keyof A]: any }, A>(
   schema: S.Schema<I, A>
 ): { [K in keyof A]: S.Schema<I[K], A[K]> } => {
   const out: Record<PropertyKey, S.Schema<any>> = {};
   const propertySignatures = AST.getPropertySignatures(schema.ast);
   for (let i = 0; i < propertySignatures.length; i++) {
-    const propertySignature = propertySignatures[i];
+    const propertySignature = propertySignatures[i]!;
     out[propertySignature.name] = S.make(propertySignature.type);
   }
   return out as any;
