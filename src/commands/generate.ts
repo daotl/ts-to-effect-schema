@@ -292,7 +292,7 @@ See more help with --help`,
       }
     }
 
-    errors.map(this.warn)
+    errors.map(this.warn.bind(this))
 
     if (!flags.skipValidation) {
       const validatorSpinner = ora('Validating generated types').start()

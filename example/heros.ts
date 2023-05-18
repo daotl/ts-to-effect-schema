@@ -33,6 +33,7 @@ export interface Villain {
   powers: EnemyPower[]
   friends: Villain[]
   canBeTrusted: never
+  age: unknown
 }
 
 export interface EvilPlan {
@@ -44,7 +45,8 @@ export interface EvilPlan {
 
 export interface EvilPlanDetails {
   parent: EvilPlan // <- Unsolvable circular reference
-  steps: string[]
+  // steps: string[]
+  u: Uint8Array
 }
 
 export type Story = [subject: string, problems: string[]]
@@ -90,10 +92,10 @@ export interface Exported {
   b: string
 }
 
-// export type GetSupermanSkill = (
-//   skillName: string,
-//   withKryptonite?: boolean,
-// ) => string
+export type GetSupermanSkill = (
+  skillName: string,
+  withKryptonite?: boolean,
+) => string
 
 export interface HeroContact {
   /**
@@ -135,7 +137,13 @@ export interface HeroContact {
 }
 
 interface Person {
+  /**
+   * Does the hero has super power?
+   *
+   * @default "dddd"
+   */
   name: string
+  organizationLicensePhoto?: Uint8Array | null
 }
 
 interface Info {
@@ -143,3 +151,12 @@ interface Info {
 }
 
 export type Jim = Person & Info
+// export interface pipe {
+//   name: "pipe";
+//   pipe: () => string;
+// }
+
+// const pipe: pipe = {
+//   name: 'pipe',
+//   pipe: () => 'pipe'
+// }

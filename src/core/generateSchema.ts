@@ -673,16 +673,27 @@ function buildEffectSchemaPrimitive({
         callPipe(undefined, [
           intersectionSchema,
           callCreateCallExpression(S, 'extend', undefined, [
-            buildEffectSchemaPrimitive({
-              S,
-              typeNode: node,
-              isOptional: false,
-              jsDocTags: {},
-              sourceFile,
-              dependencies,
-              getDependencyName,
-              skipParseJSDoc,
-            }),
+            f.createCallExpression(
+              f.createIdentifier('omitCommonProperties'),
+              undefined,
+              [
+                callCreateCallExpression(S, 'to', undefined, [
+                  buildEffectSchemaPrimitive({
+                    S,
+                    typeNode: node,
+                    isOptional: false,
+                    jsDocTags: {},
+                    sourceFile,
+                    dependencies,
+                    getDependencyName,
+                    skipParseJSDoc,
+                  }),
+                ]),
+                callCreateCallExpression(S, 'to', undefined, [
+                  intersectionSchema,
+                ]),
+              ],
+            ),
           ]),
         ]),
       basePrimitive,
@@ -816,7 +827,16 @@ function buildEffectSchemaExtendedSchema(
     effectSchemaCall = callPipe(undefined, [
       effectSchemaCall,
       callCreateCallExpression(S, 'extend', undefined, [
-        f.createIdentifier(schemaList[i]),
+        f.createCallExpression(
+          f.createIdentifier('omitCommonProperties'),
+          undefined,
+          [
+            callCreateCallExpression(S, 'to', undefined, [
+              f.createIdentifier(schemaList[i]),
+            ]),
+            callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
+          ],
+        ),
       ]),
     ])
   }
@@ -824,7 +844,16 @@ function buildEffectSchemaExtendedSchema(
   if (args?.length) {
     effectSchemaCall = callPipe(undefined, [
       effectSchemaCall,
-      callCreateCallExpression(S, 'extend', undefined, args),
+      callCreateCallExpression(S, 'extend', undefined, [
+        f.createCallExpression(
+          f.createIdentifier('omitCommonProperties'),
+          undefined,
+          [
+            callCreateCallExpression(S, 'to', undefined, [...args]),
+            callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
+          ],
+        ),
+      ]),
     ])
   }
 
@@ -1138,17 +1167,25 @@ function buildSchemaReference(
     dependencies.push(dependencyName)
 
     const e = f.createPropertyAccessExpression(
-      callCreateCallExpression('S', 'getPropertySignatures', undefined, [
-        f.createIdentifier(dependencyName),
-      ]),
+      f.createCallExpression(
+        f.createIdentifier('getPropertySchemas'),
+        undefined,
+        [
+          callCreateCallExpression('S', 'to', undefined, [
+            f.createIdentifier(dependencyName),
+          ]),
+        ],
+      ),
       f.createIdentifier(indexTypeName),
     )
 
     return path
       ? f.createPropertyAccessExpression(
-          callCreateCallExpression('S', 'getPropertySignatures', undefined, [
-            e,
-          ]),
+          f.createCallExpression(
+            f.createIdentifier('getPropertySchemas'),
+            undefined,
+            [callCreateCallExpression('S', 'to', undefined, [e])],
+          ),
           f.createIdentifier(path.slice(0, -1)),
         )
       : e
