@@ -233,7 +233,7 @@ describe('generateSchema', () => {
     const source =
       'export type SupermanWithWeakness = Superman & { weakness: Kryptonite };'
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanWithWeaknessSchema = pipe(supermanSchema, S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanWithWeaknessSchema = supermanSchema.pipe(S.extend(omitCommonProperties(S.to(S.struct({
           weakness: kryptoniteSchema
       })), S.to(supermanSchema))));"
     `)
@@ -407,7 +407,7 @@ describe('generateSchema', () => {
      withPower: boolean;
    }`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = pipe(clarkSchema, S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.to(S.struct({
           withPower: S.boolean
       })), S.to(clarkSchema))));"
     `)
@@ -426,9 +426,9 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = pipe(pipe(clarkSchema, S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))), S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))).pipe(S.extend(omitCommonProperties(S.to(S.struct({
           withPower: S.boolean
-      })), S.to(pipe(clarkSchema, S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema))))))));"
+      })), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema))))))));"
     `)
   })
 
@@ -438,9 +438,9 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = pipe(pipe(clarkSchema, S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))), S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))).pipe(S.extend(omitCommonProperties(S.to(S.struct({
           withPower: S.boolean
-      })), S.to(pipe(clarkSchema, S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema))))))));"
+      })), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema))))))));"
     `)
   })
 
@@ -450,9 +450,9 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = pipe(pipe(pipe(clarkSchema, S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))), S.extend(omitCommonProperties(S.to(kryptonianSchema), S.to(pipe(clarkSchema, S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))))))), S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))).pipe(S.extend(omitCommonProperties(S.to(kryptonianSchema), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))))))).pipe(S.extend(omitCommonProperties(S.to(S.struct({
           withPower: S.boolean
-      })), S.to(pipe(pipe(clarkSchema, S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))), S.extend(omitCommonProperties(S.to(kryptonianSchema), S.to(pipe(clarkSchema, S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema))))))))))));"
+      })), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))).pipe(S.extend(omitCommonProperties(S.to(kryptonianSchema), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema))))))))))));"
     `)
   })
 
@@ -613,7 +613,7 @@ describe('generateSchema', () => {
     };`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const moviesSchema = S.record(S.string, movieSchema).and(S.struct({
-          "Man of Steel": pipe(movieSchema, S.extend(omitCommonProperties(S.to(S.struct({
+          "Man of Steel": movieSchema.pipe(S.extend(omitCommonProperties(S.to(S.struct({
               title: S.literal("Man of Steel")
           })), S.to(movieSchema))))
       }));"
@@ -702,13 +702,13 @@ describe('generateSchema', () => {
            * @minLength 2
            * @maxLength 50
            */
-          name: pipe(S.string, S.minLength(2), S.maxLength(50)),
+          name: S.string.pipe(S.minLength(2)).pipe(S.maxLength(50)),
           /**
            * The phone number of the hero.
            *
            * @pattern ^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$
            */
-          phoneNumber: pipe(S.string, S.pattern(/^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$/)),
+          phoneNumber: S.string.pipe(S.pattern(/^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$/)),
           /**
            * Does the hero has super power?
            *
@@ -721,7 +721,7 @@ describe('generateSchema', () => {
            * @minimum 0
            * @maximum 500
            */
-          age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(500))
+          age: S.number.pipe(S.greaterThanOrEqualTo(0)).pipe(S.lessThanOrEqualTo(500))
       });"
     `)
   })
@@ -756,19 +756,19 @@ describe('generateSchema', () => {
            *
            * @format email Should be an email
            */
-          heroEmail: pipe(S.string, S.email("Should be an email")),
+          heroEmail: S.string.pipe(S.email("Should be an email")),
           /**
            * The email of the enemy.
            *
            * @format email, "Should be an email"
            */
-          enemyEmail: pipe(S.string, S.email("Should be an email")),
+          enemyEmail: S.string.pipe(S.email("Should be an email")),
           /**
            * The email of the superman.
            *
            * @format email "Should be an email"
            */
-          supermanEmail: pipe(S.string, S.email("Should be an email"))
+          supermanEmail: S.string.pipe(S.email("Should be an email"))
       });"
     `)
   })
@@ -805,21 +805,21 @@ describe('generateSchema', () => {
            *
            * @format email should be an email
            */
-          email: pipe(S.string, S.email("should be an email")),
+          email: S.string.pipe(S.email("should be an email")),
           /**
            * The name of the hero.
            *
            * @minLength 2, should be more than 2
            * @maxLength 50 should be less than 50
            */
-          name: pipe(S.string, S.minLength(2, "should be more than 2"), S.maxLength(50, "should be less than 50")),
+          name: S.string.pipe(S.minLength(2, "should be more than 2")).pipe(S.maxLength(50, "should be less than 50")),
           /**
            * The age of the hero
            *
            * @minimum 0 you are too young
            * @maximum 500, "you are too old"
            */
-          age: pipe(S.number, S.greaterThanOrEqualTo(0, "you are too young"), S.lessThanOrEqualTo(500, "you are too old"))
+          age: S.number.pipe(S.greaterThanOrEqualTo(0, "you are too young")).pipe(S.lessThanOrEqualTo(500, "you are too old"))
       });"
     `)
   })
@@ -834,7 +834,7 @@ describe('generateSchema', () => {
       "/**
           * @minLength 1
           */
-      export const nonEmptyStringSchema = pipe(S.string, S.minLength(1));"
+      export const nonEmptyStringSchema = S.string.pipe(S.minLength(1));"
     `)
   })
 
@@ -852,11 +852,11 @@ describe('generateSchema', () => {
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const aSchema = S.struct({
           /** @minimum 0 */
-          a: S.nullable(pipe(S.number, S.greaterThanOrEqualTo(0))),
+          a: S.nullable(S.number.pipe(S.greaterThanOrEqualTo(0))),
           /** @minLength 1 */
-          b: S.nullable(pipe(S.string, S.minLength(1))),
+          b: S.nullable(S.string.pipe(S.minLength(1))),
           /** @pattern ^c$ */
-          c: S.nullable(pipe(S.string, S.pattern(/^c$/)))
+          c: S.nullable(S.string.pipe(S.pattern(/^c$/)))
       });"
     `)
   })

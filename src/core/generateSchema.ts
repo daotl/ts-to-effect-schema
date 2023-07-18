@@ -4,7 +4,7 @@ import * as ts from 'typescript'
 import { findNode } from '../utils/findNode'
 import { isNotNull } from '../utils/isNotNull'
 import {
-  callPipe,
+  // callPipe,
   callCreateCallExpression,
   callCreatePropertyAccessExpression,
 } from '../utils/commonSchema'
@@ -668,36 +668,33 @@ function buildEffectSchemaPrimitive({
       skipParseJSDoc,
     })
 
-    return rest.reduce(
-      (intersectionSchema, node) =>
-        callPipe(undefined, [
-          intersectionSchema,
-          callCreateCallExpression(S, 'extend', undefined, [
-            f.createCallExpression(
-              f.createIdentifier('omitCommonProperties'),
-              undefined,
-              [
-                callCreateCallExpression(S, 'to', undefined, [
-                  buildEffectSchemaPrimitive({
-                    S,
-                    typeNode: node,
-                    isOptional: false,
-                    jsDocTags: {},
-                    sourceFile,
-                    dependencies,
-                    getDependencyName,
-                    skipParseJSDoc,
-                  }),
-                ]),
-                callCreateCallExpression(S, 'to', undefined, [
-                  intersectionSchema,
-                ]),
-              ],
-            ),
-          ]),
+    return rest.reduce((intersectionSchema, node) => {
+      return callCreateCallExpression(intersectionSchema, 'pipe', undefined, [
+        callCreateCallExpression(S, 'extend', undefined, [
+          f.createCallExpression(
+            f.createIdentifier('omitCommonProperties'),
+            undefined,
+            [
+              callCreateCallExpression(S, 'to', undefined, [
+                buildEffectSchemaPrimitive({
+                  S,
+                  typeNode: node,
+                  isOptional: false,
+                  jsDocTags: {},
+                  sourceFile,
+                  dependencies,
+                  getDependencyName,
+                  skipParseJSDoc,
+                }),
+              ]),
+              callCreateCallExpression(S, 'to', undefined, [
+                intersectionSchema,
+              ]),
+            ],
+          ),
         ]),
-      basePrimitive,
-    )
+      ])
+    }, basePrimitive)
   }
 
   if (ts.isLiteralTypeNode(typeNode)) {
@@ -824,37 +821,73 @@ function buildEffectSchemaExtendedSchema(
 ) {
   let effectSchemaCall = f.createIdentifier(schemaList[0]) as ts.Expression
   for (let i = 1; i < schemaList.length; i++) {
-    effectSchemaCall = callPipe(undefined, [
+    effectSchemaCall = callCreateCallExpression(
       effectSchemaCall,
-      callCreateCallExpression(S, 'extend', undefined, [
-        f.createCallExpression(
-          f.createIdentifier('omitCommonProperties'),
-          undefined,
-          [
-            callCreateCallExpression(S, 'to', undefined, [
-              f.createIdentifier(schemaList[i]),
-            ]),
-            callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
-          ],
-        ),
-      ]),
-    ])
+      'pipe',
+      undefined,
+      [
+        callCreateCallExpression(S, 'extend', undefined, [
+          f.createCallExpression(
+            f.createIdentifier('omitCommonProperties'),
+            undefined,
+            [
+              callCreateCallExpression(S, 'to', undefined, [
+                f.createIdentifier(schemaList[i]),
+              ]),
+              callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
+            ],
+          ),
+        ]),
+      ],
+    )
+    // effectSchemaCall = call_Pipe(undefined, [
+    //   effectSchemaCall,
+    //   callCreateCallExpression(S, 'extend', undefined, [
+    //     f.createCallExpression(
+    //       f.createIdentifier('omitCommonProperties'),
+    //       undefined,
+    //       [
+    //         callCreateCallExpression(S, 'to', undefined, [
+    //           f.createIdentifier(schemaList[i]),
+    //         ]),
+    //         callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
+    //       ],
+    //     ),
+    //   ]),
+    // ])
   }
 
   if (args?.length) {
-    effectSchemaCall = callPipe(undefined, [
+    effectSchemaCall = callCreateCallExpression(
       effectSchemaCall,
-      callCreateCallExpression(S, 'extend', undefined, [
-        f.createCallExpression(
-          f.createIdentifier('omitCommonProperties'),
-          undefined,
-          [
-            callCreateCallExpression(S, 'to', undefined, [...args]),
-            callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
-          ],
-        ),
-      ]),
-    ])
+      'pipe',
+      undefined,
+      [
+        callCreateCallExpression(S, 'extend', undefined, [
+          f.createCallExpression(
+            f.createIdentifier('omitCommonProperties'),
+            undefined,
+            [
+              callCreateCallExpression(S, 'to', undefined, [...args]),
+              callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
+            ],
+          ),
+        ]),
+      ],
+    )
+    // effectSchemaCall = call_Pipe(undefined, [
+    //   effectSchemaCall,
+    //   callCreateCallExpression(S, "extend", undefined, [
+    //     f.createCallExpression(
+    //       f.createIdentifier("omitCommonProperties"),
+    //       undefined,
+    //       [
+    //         callCreateCallExpression(S, "to", undefined, [...args]),
+    //         callCreateCallExpression(S, "to", undefined, [effectSchemaCall]),
+    //       ]
+    //     ),
+    //   ]),
+    // ]);
   }
 
   return withEffectSchemaProperties(S, effectSchemaCall, properties)
@@ -910,7 +943,12 @@ function withEffectSchemaProperties(
             ...expressionWithProperties,
             arguments: [...ex.arguments, e],
           }
-        : callPipe(undefined, [expressionWithProperties, e])
+        : callCreateCallExpression(
+            expressionWithProperties,
+            'pipe',
+            undefined,
+            [e],
+          ) //call_Pipe(undefined, [expressionWithProperties, e]);
     }
 
     return e

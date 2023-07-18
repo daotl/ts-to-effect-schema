@@ -18,8 +18,8 @@ export function resolveDefaultProperties(sourceText: string) {
   const removeOptionalTransformer: ts.TransformerFactory<ts.SourceFile> = (
     context,
   ) => {
-    const visit: ts.Visitor<ts.Node, ts.Node> = (node) => {
-      node = ts.visitEachChild(node, visit, context)
+    const visit: ts.Visitor<ts.Node, ts.Node> = (_node) => {
+      const node = ts.visitEachChild(_node, visit, context)
 
       if (ts.isPropertySignature(node)) {
         const jsDocTags = getJSDocTags(node, sourceFile)

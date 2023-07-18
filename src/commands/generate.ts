@@ -143,6 +143,7 @@ class TsToEffect extends Command {
   async run() {
     const { args, flags } = await this.parse(TsToEffect)
     if (flags.init) {
+      // rome-ignore lint/complexity/noExtraSemicolon: Rome's bug
       ;(await createConfig(configPath))
         ? this.log('🧐 ts-to-effect-schema.config.js created!')
         : this.log('Nothing changed!')
