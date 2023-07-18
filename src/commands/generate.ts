@@ -1,9 +1,5 @@
-// import { Command, flags } from '@oclif/command'
 import type { OutputFlags } from '@oclif/core/lib/interfaces/parser'
 import { Command, Flags, Args, Errors } from '@oclif/core'
-import type { WritableDeep } from 'type-fest'
-// import { OutputFlags } from '@oclif/parser'
-// import { error as oclifError } from '@oclif/errors'
 import { readFile, outputFile, existsSync } from 'fs-extra'
 import { join, relative, parse } from 'path'
 import slash from 'slash'
@@ -47,8 +43,8 @@ try {
     const rawConfig = require(slash(
       relative(__dirname, `${configPath}${configExt}`),
     ))
-    const c = S.parse(tsToEffectConfigSchema)(rawConfig)
-    config = c as WritableDeep<typeof c>
+    const c = S.parseSync(tsToEffectConfigSchema)(rawConfig)
+    config = c as unknown as TsToEffectConfig
 
     if (Array.isArray(config)) {
       haveMultiConfig = true

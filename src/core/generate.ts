@@ -350,10 +350,6 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
     ? `import * as AST from '@effect/schema/AST';`
     : ''
 }${
-  usedSchemaNames.includes('pipe')
-    ? 'import { pipe } from "@effect/data/Function";\n'
-    : ''
-}${
   typeImports.length
     ? `import type { ${typeImports.join(', ')} } from "${typesImportPath}";\n`
     : ''
@@ -439,10 +435,7 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
       ) as unknown as (keyof CommonKey<A, B>)[];
 
       if (intersections.length) {
-        return pipe(
-          self,
-          S.omit<A, (keyof CommonKey<A, B>)[]>(...intersections)
-        ) as unknown as R;
+        return self.pipe(S.omit<A, (keyof CommonKey<A, B>)[]>(...intersections)) as unknown as R
       }
 
       return self as unknown as R;

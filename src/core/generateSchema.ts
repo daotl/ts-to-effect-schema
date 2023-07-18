@@ -4,7 +4,6 @@ import * as ts from 'typescript'
 import { findNode } from '../utils/findNode'
 import { isNotNull } from '../utils/isNotNull'
 import {
-  // callPipe,
   callCreateCallExpression,
   callCreatePropertyAccessExpression,
 } from '../utils/commonSchema'
@@ -840,21 +839,6 @@ function buildEffectSchemaExtendedSchema(
         ]),
       ],
     )
-    // effectSchemaCall = call_Pipe(undefined, [
-    //   effectSchemaCall,
-    //   callCreateCallExpression(S, 'extend', undefined, [
-    //     f.createCallExpression(
-    //       f.createIdentifier('omitCommonProperties'),
-    //       undefined,
-    //       [
-    //         callCreateCallExpression(S, 'to', undefined, [
-    //           f.createIdentifier(schemaList[i]),
-    //         ]),
-    //         callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
-    //       ],
-    //     ),
-    //   ]),
-    // ])
   }
 
   if (args?.length) {
@@ -875,19 +859,6 @@ function buildEffectSchemaExtendedSchema(
         ]),
       ],
     )
-    // effectSchemaCall = call_Pipe(undefined, [
-    //   effectSchemaCall,
-    //   callCreateCallExpression(S, "extend", undefined, [
-    //     f.createCallExpression(
-    //       f.createIdentifier("omitCommonProperties"),
-    //       undefined,
-    //       [
-    //         callCreateCallExpression(S, "to", undefined, [...args]),
-    //         callCreateCallExpression(S, "to", undefined, [effectSchemaCall]),
-    //       ]
-    //     ),
-    //   ]),
-    // ]);
   }
 
   return withEffectSchemaProperties(S, effectSchemaCall, properties)
@@ -948,7 +919,7 @@ function withEffectSchemaProperties(
             'pipe',
             undefined,
             [e],
-          ) //call_Pipe(undefined, [expressionWithProperties, e]);
+          )
     }
 
     return e
