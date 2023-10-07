@@ -5,10 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1c6dcb3d-1c78-4cce-8f96-c8a01580a27f" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/daotl-ts-to-effect-schema.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/heros.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/example/heros.schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/heros.types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/example/heros.types.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/commands/generate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/generate.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/generate.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/generate.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/generate.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/generate.ts" afterDir="false" />
@@ -60,7 +67,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1696661922507</updated>
-      <workItem from="1696661924185" duration="1828000" />
+      <workItem from="1696661924185" duration="2172000" />
     </task>
     <servers />
   </component>

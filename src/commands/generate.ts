@@ -103,7 +103,7 @@ class TsToEffect extends Command {
       description: 'Skip the validation step (not recommended)',
     }),
     inferredTypes: Flags.string({
-      description: 'Path of S.To<> types file',
+      description: 'Path of S.Schema.To<> types file',
     }),
     watch: Flags.boolean({
       char: 'w',

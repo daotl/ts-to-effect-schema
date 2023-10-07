@@ -89,7 +89,7 @@ export interface GenerateProps {
   skipParseJSDoc?: boolean
 
   /**
-   * Path of S.To<> types file.
+   * Path of S.Schema.To<> types file.
    */
   inferredTypes?: string
 }
@@ -475,7 +475,7 @@ function expectType<T>(_: T) {
 ${Array.from(statements.values())
   .filter(isExported)
   .map((statement) => {
-    // Generate S.To<>
+    // Generate S.Schema.To<>
     const effectInferredSchema = generateSchemaInferredType({
       aliasName: `${getSchemaName(statement.typeName)}InferredType`,
       effectConstName: `generated.${getSchemaName(statement.typeName)}`,

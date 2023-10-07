@@ -22,7 +22,7 @@ describe('generateSchemaInferredType', () => {
     expect(
       printer.printNode(ts.EmitHint.Unspecified, output, sourceFile),
     ).toMatchInlineSnapshot(
-      `"export type Superman = S.To<typeof supermanSchema>;"`,
+      `"export type Superman = S.Schema.To<typeof supermanSchema>;"`,
     )
   })
 })

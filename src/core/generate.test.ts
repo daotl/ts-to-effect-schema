@@ -60,11 +60,11 @@ describe('generate', () => {
           /* noop */
         }
 
-        export type nameSchemaInferredType = S.To<typeof generated.nameSchema>;
+        export type nameSchemaInferredType = S.Schema.To<typeof generated.nameSchema>;
 
-        export type supermanSchemaInferredType = S.To<typeof generated.supermanSchema>;
+        export type supermanSchemaInferredType = S.Schema.To<typeof generated.supermanSchema>;
 
-        export type badassSupermanSchemaInferredType = S.To<typeof generated.badassSupermanSchema>;
+        export type badassSupermanSchemaInferredType = S.Schema.To<typeof generated.badassSupermanSchema>;
 
         expectType<ReadonlyDeep<spec.Name>>({} as ReadonlyDeep<spec.Name>)
         expectType<ReadonlyDeep<spec.Name>>({} as ReadonlyDeep<spec.Name>)
@@ -129,9 +129,9 @@ describe('generate', () => {
           /* noop */
         }
 
-        export type superheroSchemaInferredType = S.To<typeof generated.superheroSchema>;
+        export type superheroSchemaInferredType = S.Schema.To<typeof generated.superheroSchema>;
 
-        export type favoriteSuperheroSchemaInferredType = S.To<typeof generated.favoriteSuperheroSchema>;
+        export type favoriteSuperheroSchemaInferredType = S.Schema.To<typeof generated.favoriteSuperheroSchema>;
 
         expectType<ReadonlyDeep<spec.Superhero>>({} as ReadonlyDeep<spec.Superhero>)
         expectType<ReadonlyDeep<spec.Superhero>>({} as ReadonlyDeep<spec.Superhero>)
@@ -242,11 +242,11 @@ describe('generate', () => {
           /* noop */
         }
 
-        export type villainSchemaInferredType = S.To<typeof generated.villainSchema>;
+        export type villainSchemaInferredType = S.Schema.To<typeof generated.villainSchema>;
 
-        export type evilPlanSchemaInferredType = S.To<typeof generated.evilPlanSchema>;
+        export type evilPlanSchemaInferredType = S.Schema.To<typeof generated.evilPlanSchema>;
 
-        export type evilPlanDetailsSchemaInferredType = S.To<typeof generated.evilPlanDetailsSchema>;
+        export type evilPlanDetailsSchemaInferredType = S.Schema.To<typeof generated.evilPlanDetailsSchema>;
 
         expectType<ReadonlyDeep<spec.Villain>>({} as ReadonlyDeep<spec.Villain>)
         expectType<ReadonlyDeep<spec.Villain>>({} as ReadonlyDeep<spec.Villain>)
@@ -427,9 +427,9 @@ describe('generate', () => {
           /* noop */
         }
 
-        export type nameSchemaInferredType = S.To<typeof generated.nameSchema>;
+        export type nameSchemaInferredType = S.Schema.To<typeof generated.nameSchema>;
 
-        export type badassSupermanSchemaInferredType = S.To<typeof generated.badassSupermanSchema>;
+        export type badassSupermanSchemaInferredType = S.Schema.To<typeof generated.badassSupermanSchema>;
 
         expectType<ReadonlyDeep<spec.Name>>({} as ReadonlyDeep<spec.Name>)
         expectType<ReadonlyDeep<spec.Name>>({} as ReadonlyDeep<spec.Name>)
@@ -501,11 +501,11 @@ describe('generate', () => {
           /* noop */
         }
 
-        export type metropolisNameSchemaInferredType = S.To<typeof generated.metropolisNameSchema>;
+        export type metropolisNameSchemaInferredType = S.Schema.To<typeof generated.metropolisNameSchema>;
 
-        export type metropolisSupermanSchemaInferredType = S.To<typeof generated.metropolisSupermanSchema>;
+        export type metropolisSupermanSchemaInferredType = S.Schema.To<typeof generated.metropolisSupermanSchema>;
 
-        export type metropolisBadassSupermanSchemaInferredType = S.To<typeof generated.metropolisBadassSupermanSchema>;
+        export type metropolisBadassSupermanSchemaInferredType = S.Schema.To<typeof generated.metropolisBadassSupermanSchema>;
 
         expectType<ReadonlyDeep<spec.MetropolisName>>({} as ReadonlyDeep<spec.MetropolisName>)
         expectType<ReadonlyDeep<spec.MetropolisName>>({} as ReadonlyDeep<spec.MetropolisName>)
