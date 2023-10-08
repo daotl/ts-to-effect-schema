@@ -5,15 +5,15 @@ import { JSDocTagFilter, NameFilter } from '../config'
 import { getSimplifiedJsDocTags } from '../utils/getSimplifiedJsDocTags'
 import { resolveModules } from '../utils/resolveModules'
 import {
+  TypeNode,
   getExtractedTypeNames,
   isTypeNode,
-  TypeNode,
 } from '../utils/traverseTypes'
-import { generateIntegrationTests } from './generateIntegrationTests'
-import { generateSchemaInferredType } from './generateSchemaInferredType'
-import { generateSchemaVariableStatement } from './generateSchema'
-import { transformRecursiveSchema } from './transformRecursiveSchema'
 import { standardBuiltInObjectVarNames } from './const'
+import { generateIntegrationTests } from './generateIntegrationTests'
+import { generateSchemaVariableStatement } from './generateSchema'
+import { generateSchemaInferredType } from './generateSchemaInferredType'
+import { transformRecursiveSchema } from './transformRecursiveSchema'
 
 const getSchemaNameList =
   (nameList: string[] = []) => (statement?: ts.VariableStatement | string) => {
@@ -415,7 +415,7 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
       B,
       R = IsEmptyObject<CommonKey<A, B>> extends true
         ? S.Schema<I, A>
-        : S.Schema<I, Omit<A, keyof CommonKey<A, B>>>
+        : S.Schema<Omit<I, keyof CommonKey<I, IB>>, Omit<A, keyof CommonKey<A, B>>>
     >(
       self: S.Schema<I, A>,
       that: S.Schema<IB, B>
