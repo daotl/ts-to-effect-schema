@@ -392,7 +392,7 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
       schema: S.Schema<I, A>
     ): { [K in keyof A]: S.Schema<I[K], A[K]> } => {
       const out: Record<PropertyKey, S.Schema<unknown>> = {}
-      const propertySignatures = AST.getPropertySignatures(schema.ast)
+      const propertySignatures = AST.getPropertySignatures(S.to(schema).ast)
       for (let i = 0; i < propertySignatures.length; i++) {
         const propertySignature = propertySignatures[i] as AST.PropertySignature
         out[propertySignature.name] = S.make(propertySignature.type)
@@ -409,9 +409,9 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
     };
 
     const omitCommonProperties = <
-      I extends { [K in keyof A]: unknown },
+      I extends { [K in keyof A]?: unknown },
       A,
-      IB extends { [K in keyof B]: unknown },
+      IB extends { [K in keyof B]?: unknown },
       B,
       R = IsEmptyObject<CommonKey<A, B>> extends true
         ? S.Schema<I, A>

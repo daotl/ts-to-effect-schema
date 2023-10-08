@@ -233,9 +233,9 @@ describe('generateSchema', () => {
     const source =
       'export type SupermanWithWeakness = Superman & { weakness: Kryptonite };'
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanWithWeaknessSchema = supermanSchema.pipe(S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanWithWeaknessSchema = supermanSchema.pipe(S.extend(omitCommonProperties(S.struct({
           weakness: kryptoniteSchema
-      })), S.to(supermanSchema))));"
+      }), supermanSchema)));"
     `)
   })
 
@@ -407,9 +407,9 @@ describe('generateSchema', () => {
      withPower: boolean;
    }`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
-      })), S.to(clarkSchema))));"
+      }), clarkSchema)));"
     `)
   })
 
@@ -426,9 +426,9 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))).pipe(S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
-      })), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema))))))));"
+      }), clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))))));"
     `)
   })
 
@@ -438,9 +438,9 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))).pipe(S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
-      })), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema))))))));"
+      }), clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))))));"
     `)
   })
 
@@ -450,9 +450,9 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))).pipe(S.extend(omitCommonProperties(S.to(kryptonianSchema), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))))))).pipe(S.extend(omitCommonProperties(S.to(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(kryptonianSchema, clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema)))))).pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
-      })), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema)))).pipe(S.extend(omitCommonProperties(S.to(kryptonianSchema), S.to(clarkSchema.pipe(S.extend(omitCommonProperties(S.to(kalLSchema), S.to(clarkSchema))))))))))));"
+      }), clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(kryptonianSchema, clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema)))))))));"
     `)
   })
 
@@ -471,7 +471,7 @@ describe('generateSchema', () => {
     const source = `export type SupermanName = Superman["name"]`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanNameSchema = getPropertySchemas(S.to(supermanSchema)).name;"`,
+      `"export const supermanNameSchema = getPropertySchemas(supermanSchema).name;"`,
     )
   })
 
@@ -479,7 +479,7 @@ describe('generateSchema', () => {
     const source = `export type SupermanFlyPower = Superman["power"]["fly"]`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanFlyPowerSchema = getPropertySchemas(S.to(getPropertySchemas(S.to(supermanSchema)).power)).fly;"`,
+      `"export const supermanFlyPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).power).fly;"`,
     )
   })
 
@@ -491,7 +491,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(S.to(getPropertySchemas(S.to(supermanSchema)).powers)).element;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
     )
   })
 
@@ -503,7 +503,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(S.to(getPropertySchemas(S.to(supermanSchema)).powers)).element;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
     )
   })
 
@@ -515,7 +515,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(S.to(supermanSchema)).powers;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`,
     )
   })
 
@@ -527,7 +527,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(S.to(supermanSchema)).powers;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`,
     )
   })
 
@@ -539,7 +539,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(S.to(getPropertySchemas(S.to(supermanSchema)).powers)).[1];"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).[1];"`,
     )
   })
 
@@ -564,7 +564,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(S.to(getPropertySchemas(S.to(supermanSchema)).powers)).element;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
     )
   })
 
@@ -576,7 +576,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(S.to(getPropertySchemas(S.to(supermanSchema)).powers)).element;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
     )
   })
 
@@ -588,7 +588,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(S.to(supermanSchema)).powers;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`,
     )
   })
 
@@ -613,9 +613,9 @@ describe('generateSchema', () => {
     };`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const moviesSchema = S.record(S.string, movieSchema).and(S.struct({
-          "Man of Steel": movieSchema.pipe(S.extend(omitCommonProperties(S.to(S.struct({
+          "Man of Steel": movieSchema.pipe(S.extend(omitCommonProperties(S.struct({
               title: S.literal("Man of Steel")
-          })), S.to(movieSchema))))
+          }), movieSchema)))
       }));"
     `)
   })

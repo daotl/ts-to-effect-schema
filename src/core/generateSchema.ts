@@ -1,19 +1,19 @@
 import { camel, lower } from 'case'
 import uniq from 'lodash/uniq'
 import * as ts from 'typescript'
-import { findNode } from '../utils/findNode'
-import { isNotNull } from '../utils/isNotNull'
 import {
   callCreateCallExpression,
   callCreatePropertyAccessExpression,
 } from '../utils/commonSchema'
+import { findNode } from '../utils/findNode'
+import { isNotNull } from '../utils/isNotNull'
+import { primitivePropertyList, standardBuiltInObjects } from './const'
 import {
-  getJSDocTags,
-  JSDocTags,
-  jsDocTagToEffectSchemaProperties,
   EffectSchemaProperty,
+  JSDocTags,
+  getJSDocTags,
+  jsDocTagToEffectSchemaProperties,
 } from './jsDocTags'
-import { standardBuiltInObjects, primitivePropertyList } from './const'
 
 const { factory: f } = ts
 
@@ -674,21 +674,17 @@ function buildEffectSchemaPrimitive({
             f.createIdentifier('omitCommonProperties'),
             undefined,
             [
-              callCreateCallExpression(S, 'to', undefined, [
-                buildEffectSchemaPrimitive({
-                  S,
-                  typeNode: node,
-                  isOptional: false,
-                  jsDocTags: {},
-                  sourceFile,
-                  dependencies,
-                  getDependencyName,
-                  skipParseJSDoc,
-                }),
-              ]),
-              callCreateCallExpression(S, 'to', undefined, [
-                intersectionSchema,
-              ]),
+              buildEffectSchemaPrimitive({
+                S,
+                typeNode: node,
+                isOptional: false,
+                jsDocTags: {},
+                sourceFile,
+                dependencies,
+                getDependencyName,
+                skipParseJSDoc,
+              }),
+              intersectionSchema,
             ],
           ),
         ]),
@@ -829,12 +825,7 @@ function buildEffectSchemaExtendedSchema(
           f.createCallExpression(
             f.createIdentifier('omitCommonProperties'),
             undefined,
-            [
-              callCreateCallExpression(S, 'to', undefined, [
-                f.createIdentifier(schemaList[i]),
-              ]),
-              callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
-            ],
+            [f.createIdentifier(schemaList[i]), effectSchemaCall],
           ),
         ]),
       ],
@@ -851,10 +842,7 @@ function buildEffectSchemaExtendedSchema(
           f.createCallExpression(
             f.createIdentifier('omitCommonProperties'),
             undefined,
-            [
-              callCreateCallExpression(S, 'to', undefined, [...args]),
-              callCreateCallExpression(S, 'to', undefined, [effectSchemaCall]),
-            ],
+            [...args, effectSchemaCall],
           ),
         ]),
       ],
@@ -1179,11 +1167,7 @@ function buildSchemaReference(
       f.createCallExpression(
         f.createIdentifier('getPropertySchemas'),
         undefined,
-        [
-          callCreateCallExpression('S', 'to', undefined, [
-            f.createIdentifier(dependencyName),
-          ]),
-        ],
+        [f.createIdentifier(dependencyName)],
       ),
       f.createIdentifier(indexTypeName),
     )
@@ -1193,7 +1177,7 @@ function buildSchemaReference(
           f.createCallExpression(
             f.createIdentifier('getPropertySchemas'),
             undefined,
-            [callCreateCallExpression('S', 'to', undefined, [e])],
+            [e],
           ),
           f.createIdentifier(path.slice(0, -1)),
         )
