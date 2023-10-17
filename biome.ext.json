@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/biome/configuration_schema.json",
+  "files": {
+    "ignore": [
+      "./scripts/biome-staged.js",
+      "./packages",
+      "**/*.json"
+    ]
+  },
+  "javascript": {
+    "globals": [
+      "$",
+      "argv",
+      "Cause",
+      "Context",
+      "Effect",
+      "Layer",
+      "Tag"
+    ]
+  }
+}
+

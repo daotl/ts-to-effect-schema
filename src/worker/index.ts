@@ -1,7 +1,7 @@
-import { spawn, Thread, Worker } from 'threads'
+import { Thread, Worker, spawn } from 'threads'
 import {
-  validateGeneratedTypes,
   ValidateGeneratedTypesProps,
+  validateGeneratedTypes,
 } from '../core/validateGeneratedTypes'
 
 /**

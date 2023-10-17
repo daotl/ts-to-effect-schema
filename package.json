@@ -1,7 +1,7 @@
 {
   "name": "ts-to-effect-schema",
   "description": "Generate @effect/schema schemas from TypeScript types/interfaces",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "homepage": "https://github.com/daotl/ts-to-effect-schema",
   "bugs": "https://github.com/daotl/ts-to-effect-schema/issues",
   "repository": "daotl/ts-to-effect-schema",
@@ -21,8 +21,8 @@
   "scripts": {
     "build": "rimraf lib && tsc -p tsconfig.package.json",
     "prepublishOnly": "pnpm test && rimraf lib && pnpm build",
-    "lint": "npx rome format . && npx rome check .",
-    "lint:fix": "npx rome format --write . && npx rome check --apply .",
+    "lint": "npx biome format . && npx biome check .",
+    "lint:fix": "npx biome format --write . && npx biome check --apply .",
     "test": "jest",
     "test:ci": "jest --ci --coverage && pnpm gen:all && tsc --noEmit",
     "gen:all": "./bin/dev --all",
@@ -41,7 +41,6 @@
     "effect": "2.0.0-next.47"
   },
   "dependencies": {
-    "effect": "2.0.0-next.47",
     "@effect/schema": "^0.42.0",
     "@oclif/core": "^2.8.2",
     "@oclif/plugin-help": "^5.2.9",
@@ -49,6 +48,7 @@
     "async": "^3.2.4",
     "case": "^1.6.3",
     "chokidar": "^3.5.3",
+    "effect": "2.0.0-next.47",
     "fs-extra": "^9.1.0",
     "inquirer": "^8.2.0",
     "lodash": "^4.17.21",
@@ -66,7 +66,8 @@
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
     "@babel/preset-typescript": "^7.21.4",
-    "@daotl/rome-config": "0.0.1-alpha.4",
+    "@biomejs/biome": "^1.2.2",
+    "@daotl/biome-config": "^0.0.1",
     "@types/async": "^3.2.19",
     "@types/fs-extra": "^9.0.9",
     "@types/inquirer": "^8.2.6",
@@ -82,7 +83,6 @@
     "oclif": "^3.8.1",
     "pretty-quick": "^3.1.3",
     "rimraf": "^5.0.0",
-    "rome": "^12.1.3",
     "ts-node": "^10.9.1",
     "type-fest": "^3.9.0"
   },

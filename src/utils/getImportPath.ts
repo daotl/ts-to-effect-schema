@@ -1,5 +1,5 @@
-import slash from 'slash'
 import { parse, relative } from 'path'
+import slash from 'slash'
 
 /**
  * Resolve the path of an import.

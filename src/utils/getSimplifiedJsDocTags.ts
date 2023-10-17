@@ -11,7 +11,6 @@ export function getSimplifiedJsDocTags(
 ): SimplifiedJSDocTag[] {
   const tags: SimplifiedJSDocTag[] = []
   jsDocs.forEach((jsDoc) => {
-    // rome-ignore lint/complexity/noExtraSemicolon: Rome's bug
     ;(jsDoc.tags || []).forEach((tag) => {
       const name = tag.tagName.escapedText.toString()
       const value = typeof tag.comment === 'string' ? tag.comment : undefined

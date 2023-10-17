@@ -1,25 +1,25 @@
+import { join, parse, relative } from 'path'
+import * as S from '@effect/schema/Schema'
+import { Args, Command, Errors, Flags } from '@oclif/core'
 import type { OutputFlags } from '@oclif/core/lib/interfaces/parser'
-import { Command, Flags, Args, Errors } from '@oclif/core'
-import { readFile, outputFile, existsSync } from 'fs-extra'
-import { join, relative, parse } from 'path'
+import { eachSeries } from 'async'
+import chokidar from 'chokidar'
+import { existsSync, outputFile, readFile } from 'fs-extra'
+import inquirer from 'inquirer'
+import ora from 'ora'
+import prettier from 'prettier'
 import slash from 'slash'
 import ts from 'typescript'
-import { generate, GenerateProps } from '../core/generate'
-import { TsToEffectConfig, Config } from '../config'
+import { Config, TsToEffectConfig } from '../config'
 import {
   tsToEffectConfigSchema,
   // getSchemaNameSchema,
   // nameFilterSchema,
 } from '../config.schema'
-import { getImportPath } from '../utils/getImportPath'
-import ora from 'ora'
-import prettier from 'prettier'
-import * as worker from '../worker'
-import inquirer from 'inquirer'
-import { eachSeries } from 'async'
+import { GenerateProps, generate } from '../core/generate'
 import { createConfig } from '../createConfig'
-import chokidar from 'chokidar'
-import * as S from '@effect/schema/Schema'
+import { getImportPath } from '../utils/getImportPath'
+import * as worker from '../worker'
 
 type ConfigExt = '.js' | '.cjs'
 
@@ -139,7 +139,6 @@ class TsToEffect extends Command {
   async run() {
     const { args, flags } = await this.parse(TsToEffect)
     if (flags.init) {
-      // rome-ignore lint/complexity/noExtraSemicolon: Rome's bug
       ;(await createConfig(configPath))
         ? this.log('🧐 ts-to-effect-schema.config.js created!')
         : this.log('Nothing changed!')

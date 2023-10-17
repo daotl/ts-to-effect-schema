@@ -370,6 +370,7 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
           ? ReplaceType<T, From, To>
           : IsUnknown<T> extends true
           ? ReplaceType<T, From, To>
+          // biome-ignore lint/complexity/noBannedTypes: <explanation>
           : T extends Function
           ? ReplaceType<T, From, To>
           : {
@@ -378,7 +379,7 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
 
     export type ReplaceDateToStringDeep<T> = ReplaceTypeDeep<T, Date, string>;
 
-    export type ObjectSchema<T extends Object> = S.Schema<
+    export type ObjectSchema<T extends object> = S.Schema<
       ReplaceDateToStringDeep<ReadonlyDeep<T>>,
       ReadonlyDeep<T>
     >;\n`
@@ -387,7 +388,7 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
   usedSchemaNames.includes('getPropertySchemas') ||
   usedSchemaNames.includes('extend')
     ? `\n// https://github.com/Effect-TS/schema/releases/tag/v0.18.0
-    // rome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     export const getPropertySchemas = <I extends { [K in keyof A]: any }, A>(
       schema: S.Schema<I, A>
     ): { [K in keyof A]: S.Schema<I[K], A[K]> } => {
@@ -397,7 +398,7 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
         const propertySignature = propertySignatures[i] as AST.PropertySignature
         out[propertySignature.name] = S.make(propertySignature.type)
       }
-      // rome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       return out as any
     }\n`
     : ''

@@ -1,5 +1,5 @@
-import ts from 'typescript'
 import { getJsDoc } from 'tsutils'
+import ts from 'typescript'
 const { factory: f } = ts
 
 /**
@@ -95,7 +95,6 @@ export function getJSDocTags(nodeType: ts.Node, sourceFile: ts.SourceFile) {
   const jsDocTags: JSDocTags = {}
   if (jsDoc.length) {
     jsDoc.forEach((doc) => {
-      // rome-ignore lint/complexity/noExtraSemicolon: Rome's bug
       ;(doc.tags || []).forEach((tag) => {
         const tagName = tag.tagName.escapedText.toString()
         if (!isJSDocTagKey(tagName) || typeof tag.comment !== 'string') {

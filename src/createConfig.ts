@@ -1,8 +1,8 @@
-import inquirer, { DistinctQuestion } from 'inquirer'
-import { existsSync, outputFile } from 'fs-extra'
 import { join } from 'path'
-import { Subject } from 'rxjs'
+import { existsSync, outputFile } from 'fs-extra'
+import inquirer, { DistinctQuestion } from 'inquirer'
 import prettier from 'prettier'
+import { Subject } from 'rxjs'
 
 /**
  * Create `ts-to-effect-schemaect-schema.config.js` file.
