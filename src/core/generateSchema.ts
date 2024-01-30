@@ -3,7 +3,7 @@ import uniq from 'lodash/uniq'
 import * as ts from 'typescript'
 import {
   callCreateCallExpression,
-  callCreatePropertyAccessExpression,
+  // callCreatePropertyAccessExpression,
 } from '../utils/commonSchema'
 import { findNode } from '../utils/findNode'
 import { isNotNull } from '../utils/isNotNull'
@@ -864,23 +864,23 @@ function withEffectSchemaProperties(
   properties: EffectSchemaProperty[] = [],
 ) {
   return properties.reduce((expressionWithProperties, property) => {
-    if (property.identifier === 'optional.withDefault') {
-      const isOptional =
-        (
-          expressionWithProperties as unknown as {
-            expression: ts.PropertyAccessExpression
-          }
-        )?.expression?.name?.escapedText === 'optional'
-      const optionalExpression = isOptional
-        ? expressionWithProperties
-        : callCreateCallExpression(s, 'optional', undefined, [
-            expressionWithProperties,
-          ])
+    if (property.identifier === 'default') {
 
-      return callCreatePropertyAccessExpression(
-        optionalExpression,
-        (property.expressions as unknown as [ts.MemberName])[0],
-      )
+      return callCreateCallExpression(s, 'optional', undefined, [
+        expressionWithProperties,
+        ...(property.expressions ?? []),
+      ])
+
+      // return callCreatePropertyAccessExpression(
+      //   optionalExpression,
+      //   (property.expressions as unknown as [ts.MemberName])[0],
+      // )
+      //  callCreateCallExpression(
+      //     s,
+      //     property.identifier,
+      //     undefined,
+      //     property.expressions ? property.expressions : [expressionWithProperties],
+      //   )
     }
 
     const e = callCreateCallExpression(

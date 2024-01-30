@@ -43,7 +43,7 @@ try {
     const rawConfig = require(slash(
       relative(__dirname, `${configPath}${configExt}`),
     ))
-    const c = S.parseSync(tsToEffectConfigSchema)(rawConfig)
+    const c = S.decodeUnknownSync(tsToEffectConfigSchema)(rawConfig)
     config = c as unknown as TsToEffectConfig
 
     if (Array.isArray(config)) {

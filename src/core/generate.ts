@@ -240,7 +240,7 @@ export function generate({
           if (notGeneratedDependencies.length === 0) {
             done = false
             if (isCircular) {
-              getSchemaNameFun('lazy')
+              getSchemaNameFun('suspend')
               typeImports.add(typeName)
               statements.set(varName, {
                 value: transformRecursiveSchema('S', statement, typeName),
@@ -278,7 +278,7 @@ export function generate({
     })
     .forEach(({ varName, statement, typeName }) => {
       typeImports.add(typeName)
-      getSchemaNameFun('lazy')
+      getSchemaNameFun('suspend')
       statements.set(varName, {
         value: transformRecursiveSchema('S', statement, typeName),
         typeName,
@@ -329,7 +329,7 @@ ${Array.from(effectSchemasWithMissingDependencies).join('\n')}`,
 
     const genTypeFestModule = () => {
       let modules = ''
-      if (usedSchemaNames.includes('lazy')) {
+      if (usedSchemaNames.includes('suspend')) {
         modules = 'Primitive, ReadonlyDeep, IsAny, IsUnknown, IsEqual'
       }
 
@@ -358,7 +358,7 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
     ? `import { ${valueImports.join(', ')} } from "${typesImportPath}";\n`
     : ''
 }${
-  usedSchemaNames.includes('lazy')
+  usedSchemaNames.includes('suspend')
     ? `\n// https://github.com/sindresorhus/type-fest/blob/2f64161921fc5e2d8e29d36ddaf2dc082017de35/source/internal.d.ts#L35
         export type BuiltIns = Primitive | Date | RegExp;
 
@@ -380,6 +380,7 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
     export type ReplaceDateToStringDeep<T> = ReplaceTypeDeep<T, Date, string>;
 
     export type ObjectSchema<T extends object> = S.Schema<
+      never,
       ReplaceDateToStringDeep<ReadonlyDeep<T>>,
       ReadonlyDeep<T>
     >;\n`
@@ -390,9 +391,9 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
     ? `\n// https://github.com/Effect-TS/schema/releases/tag/v0.18.0
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     export const getPropertySchemas = <I extends { [K in keyof A]: any }, A>(
-      schema: S.Schema<I, A>
-    ): { [K in keyof A]: S.Schema<I[K], A[K]> } => {
-      const out: Record<PropertyKey, S.Schema<unknown>> = {}
+      schema: S.Schema<never,I, A>
+    ): { [K in keyof A]: S.Schema<never, I[K], A[K]> } => {
+      const out: Record<PropertyKey, S.Schema<never,unknown>> = {}
       const propertySignatures = AST.getPropertySignatures(S.to(schema).ast)
       for (let i = 0; i < propertySignatures.length; i++) {
         const propertySignature = propertySignatures[i] as AST.PropertySignature
@@ -415,11 +416,11 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
       IB extends { [K in keyof B]?: unknown },
       B,
       R = IsEmptyObject<CommonKey<A, B>> extends true
-        ? S.Schema<I, A>
-        : S.Schema<Omit<I, keyof CommonKey<I, IB>>, Omit<A, keyof CommonKey<A, B>>>
+        ? S.Schema<never, I, A>
+        : S.Schema<never, Omit<I, keyof CommonKey<I, IB>>, Omit<A, keyof CommonKey<A, B>>>
     >(
-      self: S.Schema<I, A>,
-      that: S.Schema<IB, B>
+      self: S.Schema<never, I, A>,
+      that: S.Schema<never, IB, B>
     ): R => {
       const selfObj = getPropertySchemas(self);
       const thatObj = getPropertySchemas(that);
