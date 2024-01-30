@@ -251,12 +251,12 @@ export function jsDocTagToEffectSchemaProperties(
           `{
             default: () => ${
               typeof jsDocTags.default === 'string'
-                // https://github.com/Effect-TS/effect/issues/2002#ref-pullrequest-2104609679
-                ? `'${jsDocTags.default}' as const`
+                ? // https://github.com/Effect-TS/effect/issues/2002#ref-pullrequest-2104609679
+                  `'${jsDocTags.default}' as const`
                 : `${jsDocTags.default} as const`
             }
           }`,
-        )
+        ),
       ],
     })
   }

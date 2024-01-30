@@ -865,7 +865,6 @@ function withEffectSchemaProperties(
 ) {
   return properties.reduce((expressionWithProperties, property) => {
     if (property.identifier === 'default') {
-
       return callCreateCallExpression(s, 'optional', undefined, [
         expressionWithProperties,
         ...(property.expressions ?? []),
