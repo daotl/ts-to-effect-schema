@@ -1,5 +1,5 @@
-import ts from 'typescript'
 import { getJsDoc } from 'tsutils'
+import ts from 'typescript'
 const { factory: f } = ts
 
 /**
@@ -228,7 +228,7 @@ export function jsDocTagToEffectSchemaProperties(
       identifier: 'nullable',
     })
   }
-  if (isOptional) {
+  if (isOptional && jsDocTags.default === undefined) {
     effectSchemaProperties.push({
       identifier: 'optional',
     })
@@ -245,17 +245,18 @@ export function jsDocTagToEffectSchemaProperties(
   }
   if (jsDocTags.default !== undefined) {
     effectSchemaProperties.push({
-      identifier: 'optional.withDefault',
+      identifier: 'default',
       expressions: [
-        f.createCallExpression(f.createIdentifier('withDefault'), undefined, [
-          f.createIdentifier(
-            `() => ${
+        f.createIdentifier(
+          `{
+            default: () => ${
               typeof jsDocTags.default === 'string'
-                ? `'${jsDocTags.default}'`
-                : jsDocTags.default
-            }`,
-          ),
-        ]),
+                ? // https://github.com/Effect-TS/effect/issues/2002#ref-pullrequest-2104609679
+                  `'${jsDocTags.default}' as const`
+                : `${jsDocTags.default} as const`
+            }
+          }`,
+        ),
       ],
     })
   }

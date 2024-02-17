@@ -233,9 +233,9 @@ describe('generateSchema', () => {
     const source =
       'export type SupermanWithWeakness = Superman & { weakness: Kryptonite };'
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanWithWeaknessSchema = pipe(supermanSchema, S.extend(S.struct({
+      "export const supermanWithWeaknessSchema = supermanSchema.pipe(S.extend(omitCommonProperties(S.struct({
           weakness: kryptoniteSchema
-      })));"
+      }), supermanSchema)));"
     `)
   })
 
@@ -407,9 +407,9 @@ describe('generateSchema', () => {
      withPower: boolean;
    }`
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = pipe(clarkSchema, S.extend(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
-      })));"
+      }), clarkSchema)));"
     `)
   })
 
@@ -426,9 +426,9 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = pipe(pipe(clarkSchema, S.extend(kalLSchema)), S.extend(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
-      })));"
+      }), clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))))));"
     `)
   })
 
@@ -438,9 +438,9 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = pipe(pipe(clarkSchema, S.extend(kalLSchema)), S.extend(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
-      })));"
+      }), clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))))));"
     `)
   })
 
@@ -450,9 +450,9 @@ describe('generateSchema', () => {
      };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
-      "export const supermanSchema = pipe(pipe(pipe(clarkSchema, S.extend(kalLSchema)), S.extend(kryptonianSchema)), S.extend(S.struct({
+      "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(kryptonianSchema, clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema)))))).pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
-      })));"
+      }), clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(kryptonianSchema, clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema)))))))));"
     `)
   })
 
@@ -471,7 +471,7 @@ describe('generateSchema', () => {
     const source = `export type SupermanName = Superman["name"]`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanNameSchema = S.getPropertySignatures(supermanSchema).name;"`,
+      `"export const supermanNameSchema = getPropertySchemas(supermanSchema).name;"`,
     )
   })
 
@@ -479,7 +479,7 @@ describe('generateSchema', () => {
     const source = `export type SupermanFlyPower = Superman["power"]["fly"]`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanFlyPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).power).fly;"`,
+      `"export const supermanFlyPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).power).fly;"`,
     )
   })
 
@@ -491,7 +491,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).element;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
     )
   })
 
@@ -503,7 +503,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).element;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
     )
   })
 
@@ -515,7 +515,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = S.getPropertySignatures(supermanSchema).powers;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`,
     )
   })
 
@@ -527,7 +527,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = S.getPropertySignatures(supermanSchema).powers;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`,
     )
   })
 
@@ -539,7 +539,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).[1];"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).[1];"`,
     )
   })
 
@@ -564,7 +564,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).element;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
     )
   })
 
@@ -576,7 +576,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = S.getPropertySignatures(S.getPropertySignatures(supermanSchema).powers).element;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
     )
   })
 
@@ -588,7 +588,7 @@ describe('generateSchema', () => {
     };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = S.getPropertySignatures(supermanSchema).powers;"`,
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`,
     )
   })
 
@@ -613,9 +613,9 @@ describe('generateSchema', () => {
     };`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const moviesSchema = S.record(S.string, movieSchema).and(S.struct({
-          "Man of Steel": pipe(movieSchema, S.extend(S.struct({
+          "Man of Steel": movieSchema.pipe(S.extend(omitCommonProperties(S.struct({
               title: S.literal("Man of Steel")
-          })))
+          }), movieSchema)))
       }));"
     `)
   })
@@ -702,26 +702,28 @@ describe('generateSchema', () => {
            * @minLength 2
            * @maxLength 50
            */
-          name: pipe(S.string, S.minLength(2), S.maxLength(50)),
+          name: S.string.pipe(S.minLength(2)).pipe(S.maxLength(50)),
           /**
            * The phone number of the hero.
            *
            * @pattern ^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$
            */
-          phoneNumber: pipe(S.string, S.pattern(/^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$/)),
+          phoneNumber: S.string.pipe(S.pattern(/^([+]?d{1,2}[-s]?|)d{3}[-s]?d{3}[-s]?d{4}$/)),
           /**
            * Does the hero has super power?
            *
            * @default true
            */
-          hasSuperPower: S.optional(S.boolean).withDefault(() => true),
+          hasSuperPower: S.optional(S.boolean, {
+                  default: () => true as const
+                }),
           /**
            * The age of the hero
            *
            * @minimum 0
            * @maximum 500
            */
-          age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(500))
+          age: S.number.pipe(S.greaterThanOrEqualTo(0)).pipe(S.lessThanOrEqualTo(500))
       });"
     `)
   })
@@ -756,19 +758,19 @@ describe('generateSchema', () => {
            *
            * @format email Should be an email
            */
-          heroEmail: pipe(S.string, S.email("Should be an email")),
+          heroEmail: S.string.pipe(S.email("Should be an email")),
           /**
            * The email of the enemy.
            *
            * @format email, "Should be an email"
            */
-          enemyEmail: pipe(S.string, S.email("Should be an email")),
+          enemyEmail: S.string.pipe(S.email("Should be an email")),
           /**
            * The email of the superman.
            *
            * @format email "Should be an email"
            */
-          supermanEmail: pipe(S.string, S.email("Should be an email"))
+          supermanEmail: S.string.pipe(S.email("Should be an email"))
       });"
     `)
   })
@@ -805,21 +807,21 @@ describe('generateSchema', () => {
            *
            * @format email should be an email
            */
-          email: pipe(S.string, S.email("should be an email")),
+          email: S.string.pipe(S.email("should be an email")),
           /**
            * The name of the hero.
            *
            * @minLength 2, should be more than 2
            * @maxLength 50 should be less than 50
            */
-          name: pipe(S.string, S.minLength(2, "should be more than 2"), S.maxLength(50, "should be less than 50")),
+          name: S.string.pipe(S.minLength(2, "should be more than 2")).pipe(S.maxLength(50, "should be less than 50")),
           /**
            * The age of the hero
            *
            * @minimum 0 you are too young
            * @maximum 500, "you are too old"
            */
-          age: pipe(S.number, S.greaterThanOrEqualTo(0, "you are too young"), S.lessThanOrEqualTo(500, "you are too old"))
+          age: S.number.pipe(S.greaterThanOrEqualTo(0, "you are too young")).pipe(S.lessThanOrEqualTo(500, "you are too old"))
       });"
     `)
   })
@@ -834,7 +836,7 @@ describe('generateSchema', () => {
       "/**
           * @minLength 1
           */
-      export const nonEmptyStringSchema = pipe(S.string, S.minLength(1));"
+      export const nonEmptyStringSchema = S.string.pipe(S.minLength(1));"
     `)
   })
 
@@ -852,11 +854,11 @@ describe('generateSchema', () => {
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const aSchema = S.struct({
           /** @minimum 0 */
-          a: S.nullable(pipe(S.number, S.greaterThanOrEqualTo(0))),
+          a: S.nullable(S.number.pipe(S.greaterThanOrEqualTo(0))),
           /** @minLength 1 */
-          b: S.nullable(pipe(S.string, S.minLength(1))),
+          b: S.nullable(S.string.pipe(S.minLength(1))),
           /** @pattern ^c$ */
-          c: S.nullable(pipe(S.string, S.pattern(/^c$/)))
+          c: S.nullable(S.string.pipe(S.pattern(/^c$/)))
       });"
     `)
   })
@@ -982,27 +984,39 @@ describe('generateSchema', () => {
           /**
            * @default 42
            */
-          theAnswerToTheUltimateQuestionOfLife: S.optional(S.number).withDefault(() => 42),
+          theAnswerToTheUltimateQuestionOfLife: S.optional(S.number, {
+                  default: () => 42 as const
+                }),
           /**
            * @default false
            */
-          isVulnerable: S.optional(S.boolean).withDefault(() => false),
+          isVulnerable: S.optional(S.boolean, {
+                  default: () => false as const
+                }),
           /**
            * @default clark
            */
-          name: S.optional(S.union(S.literal("clark"), S.literal("superman"), S.literal("kal-l"))).withDefault(() => 'clark'),
+          name: S.optional(S.union(S.literal("clark"), S.literal("superman"), S.literal("kal-l")), {
+                  default: () => 'clark' as const
+                }),
           /**
            * @default The Answer to the Ultimate Question of Life
            */
-          theMeaningOf42: S.optional(S.string).withDefault(() => 'The Answer to the Ultimate Question of Life'),
+          theMeaningOf42: S.optional(S.string, {
+                  default: () => 'The Answer to the Ultimate Question of Life' as const
+                }),
           /**
            * @default ""
            */
-          emptyString: S.optional(S.string).withDefault(() => ''),
+          emptyString: S.optional(S.string, {
+                  default: () => '' as const
+                }),
           /**
            * @default "true"
            */
-          booleanAsString: S.optional(S.string).withDefault(() => 'true')
+          booleanAsString: S.optional(S.string, {
+                  default: () => 'true' as const
+                })
       });"
     `)
   })

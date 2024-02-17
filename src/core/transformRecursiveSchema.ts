@@ -31,7 +31,7 @@ export function transformRecursiveSchema(
           f.createCallExpression(
             f.createPropertyAccessExpression(
               f.createIdentifier(effectImportValue),
-              f.createIdentifier('lazy'),
+              f.createIdentifier('suspend'),
             ),
             undefined,
             [

@@ -63,7 +63,7 @@ export type Config = {
   skipParseJSDoc?: boolean
 
   /**
-   * Path of S.To<> types file.
+   * Path of S.Schema.To<> types file.
    */
   inferredTypes?: string
 }

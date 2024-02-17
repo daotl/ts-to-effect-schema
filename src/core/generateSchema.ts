@@ -1,20 +1,19 @@
 import { camel, lower } from 'case'
 import uniq from 'lodash/uniq'
 import * as ts from 'typescript'
+import {
+  callCreateCallExpression,
+  // callCreatePropertyAccessExpression,
+} from '../utils/commonSchema'
 import { findNode } from '../utils/findNode'
 import { isNotNull } from '../utils/isNotNull'
+import { primitivePropertyList, standardBuiltInObjects } from './const'
 import {
-  callPipe,
-  callCreateCallExpression,
-  callCreatePropertyAccessExpression,
-} from '../utils/commonSchema'
-import {
-  getJSDocTags,
-  JSDocTags,
-  jsDocTagToEffectSchemaProperties,
   EffectSchemaProperty,
+  JSDocTags,
+  getJSDocTags,
+  jsDocTagToEffectSchemaProperties,
 } from './jsDocTags'
-import { standardBuiltInObjects, primitivePropertyList } from './const'
 
 const { factory: f } = ts
 
@@ -668,25 +667,29 @@ function buildEffectSchemaPrimitive({
       skipParseJSDoc,
     })
 
-    return rest.reduce(
-      (intersectionSchema, node) =>
-        callPipe(undefined, [
-          intersectionSchema,
-          callCreateCallExpression(S, 'extend', undefined, [
-            buildEffectSchemaPrimitive({
-              S,
-              typeNode: node,
-              isOptional: false,
-              jsDocTags: {},
-              sourceFile,
-              dependencies,
-              getDependencyName,
-              skipParseJSDoc,
-            }),
-          ]),
+    return rest.reduce((intersectionSchema, node) => {
+      return callCreateCallExpression(intersectionSchema, 'pipe', undefined, [
+        callCreateCallExpression(S, 'extend', undefined, [
+          f.createCallExpression(
+            f.createIdentifier('omitCommonProperties'),
+            undefined,
+            [
+              buildEffectSchemaPrimitive({
+                S,
+                typeNode: node,
+                isOptional: false,
+                jsDocTags: {},
+                sourceFile,
+                dependencies,
+                getDependencyName,
+                skipParseJSDoc,
+              }),
+              intersectionSchema,
+            ],
+          ),
         ]),
-      basePrimitive,
-    )
+      ])
+    }, basePrimitive)
   }
 
   if (ts.isLiteralTypeNode(typeNode)) {
@@ -813,19 +816,37 @@ function buildEffectSchemaExtendedSchema(
 ) {
   let effectSchemaCall = f.createIdentifier(schemaList[0]) as ts.Expression
   for (let i = 1; i < schemaList.length; i++) {
-    effectSchemaCall = callPipe(undefined, [
+    effectSchemaCall = callCreateCallExpression(
       effectSchemaCall,
-      callCreateCallExpression(S, 'extend', undefined, [
-        f.createIdentifier(schemaList[i]),
-      ]),
-    ])
+      'pipe',
+      undefined,
+      [
+        callCreateCallExpression(S, 'extend', undefined, [
+          f.createCallExpression(
+            f.createIdentifier('omitCommonProperties'),
+            undefined,
+            [f.createIdentifier(schemaList[i]), effectSchemaCall],
+          ),
+        ]),
+      ],
+    )
   }
 
   if (args?.length) {
-    effectSchemaCall = callPipe(undefined, [
+    effectSchemaCall = callCreateCallExpression(
       effectSchemaCall,
-      callCreateCallExpression(S, 'extend', undefined, args),
-    ])
+      'pipe',
+      undefined,
+      [
+        callCreateCallExpression(S, 'extend', undefined, [
+          f.createCallExpression(
+            f.createIdentifier('omitCommonProperties'),
+            undefined,
+            [...args, effectSchemaCall],
+          ),
+        ]),
+      ],
+    )
   }
 
   return withEffectSchemaProperties(S, effectSchemaCall, properties)
@@ -843,23 +864,22 @@ function withEffectSchemaProperties(
   properties: EffectSchemaProperty[] = [],
 ) {
   return properties.reduce((expressionWithProperties, property) => {
-    if (property.identifier === 'optional.withDefault') {
-      const isOptional =
-        (
-          expressionWithProperties as unknown as {
-            expression: ts.PropertyAccessExpression
-          }
-        )?.expression?.name?.escapedText === 'optional'
-      const optionalExpression = isOptional
-        ? expressionWithProperties
-        : callCreateCallExpression(s, 'optional', undefined, [
-            expressionWithProperties,
-          ])
+    if (property.identifier === 'default') {
+      return callCreateCallExpression(s, 'optional', undefined, [
+        expressionWithProperties,
+        ...(property.expressions ?? []),
+      ])
 
-      return callCreatePropertyAccessExpression(
-        optionalExpression,
-        (property.expressions as unknown as [ts.MemberName])[0],
-      )
+      // return callCreatePropertyAccessExpression(
+      //   optionalExpression,
+      //   (property.expressions as unknown as [ts.MemberName])[0],
+      // )
+      //  callCreateCallExpression(
+      //     s,
+      //     property.identifier,
+      //     undefined,
+      //     property.expressions ? property.expressions : [expressionWithProperties],
+      //   )
     }
 
     const e = callCreateCallExpression(
@@ -881,7 +901,12 @@ function withEffectSchemaProperties(
             ...expressionWithProperties,
             arguments: [...ex.arguments, e],
           }
-        : callPipe(undefined, [expressionWithProperties, e])
+        : callCreateCallExpression(
+            expressionWithProperties,
+            'pipe',
+            undefined,
+            [e],
+          )
     }
 
     return e
@@ -1138,17 +1163,21 @@ function buildSchemaReference(
     dependencies.push(dependencyName)
 
     const e = f.createPropertyAccessExpression(
-      callCreateCallExpression('S', 'getPropertySignatures', undefined, [
-        f.createIdentifier(dependencyName),
-      ]),
+      f.createCallExpression(
+        f.createIdentifier('getPropertySchemas'),
+        undefined,
+        [f.createIdentifier(dependencyName)],
+      ),
       f.createIdentifier(indexTypeName),
     )
 
     return path
       ? f.createPropertyAccessExpression(
-          callCreateCallExpression('S', 'getPropertySignatures', undefined, [
-            e,
-          ]),
+          f.createCallExpression(
+            f.createIdentifier('getPropertySchemas'),
+            undefined,
+            [e],
+          ),
           f.createIdentifier(path.slice(0, -1)),
         )
       : e

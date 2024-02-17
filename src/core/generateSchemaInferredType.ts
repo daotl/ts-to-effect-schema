@@ -26,7 +26,7 @@ export function generateSchemaInferredType({
     f.createTypeReferenceNode(
       f.createQualifiedName(
         f.createIdentifier(effectImportValue),
-        f.createIdentifier('To'),
+        f.createIdentifier('Schema.To'),
       ),
       [f.createTypeQueryNode(f.createIdentifier(effectConstName))],
     ),

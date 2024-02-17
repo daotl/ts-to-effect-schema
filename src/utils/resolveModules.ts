@@ -1,5 +1,5 @@
 import { pascal } from 'case'
-import ts, { factory as f, SourceFile } from 'typescript'
+import ts, { SourceFile, factory as f } from 'typescript'
 
 /**
  * Resolve all modules from a source text.

@@ -1,29 +1,25 @@
-// import { Command, flags } from '@oclif/command'
+import { join, parse, relative } from 'path'
+import * as S from '@effect/schema/Schema'
+import { Args, Command, Errors, Flags } from '@oclif/core'
 import type { OutputFlags } from '@oclif/core/lib/interfaces/parser'
-import { Command, Flags, Args, Errors } from '@oclif/core'
-import type { WritableDeep } from 'type-fest'
-// import { OutputFlags } from '@oclif/parser'
-// import { error as oclifError } from '@oclif/errors'
-import { readFile, outputFile, existsSync } from 'fs-extra'
-import { join, relative, parse } from 'path'
+import { eachSeries } from 'async'
+import chokidar from 'chokidar'
+import { existsSync, outputFile, readFile } from 'fs-extra'
+import inquirer from 'inquirer'
+import ora from 'ora'
+import prettier from 'prettier'
 import slash from 'slash'
 import ts from 'typescript'
-import { generate, GenerateProps } from '../core/generate'
-import { TsToEffectConfig, Config } from '../config'
+import { Config, TsToEffectConfig } from '../config'
 import {
   tsToEffectConfigSchema,
   // getSchemaNameSchema,
   // nameFilterSchema,
 } from '../config.schema'
-import { getImportPath } from '../utils/getImportPath'
-import ora from 'ora'
-import prettier from 'prettier'
-import * as worker from '../worker'
-import inquirer from 'inquirer'
-import { eachSeries } from 'async'
+import { GenerateProps, generate } from '../core/generate'
 import { createConfig } from '../createConfig'
-import chokidar from 'chokidar'
-import * as S from '@effect/schema/Schema'
+import { getImportPath } from '../utils/getImportPath'
+import * as worker from '../worker'
 
 type ConfigExt = '.js' | '.cjs'
 
@@ -47,8 +43,8 @@ try {
     const rawConfig = require(slash(
       relative(__dirname, `${configPath}${configExt}`),
     ))
-    const c = S.parse(tsToEffectConfigSchema)(rawConfig)
-    config = c as WritableDeep<typeof c>
+    const c = S.decodeUnknownSync(tsToEffectConfigSchema)(rawConfig)
+    config = c as unknown as TsToEffectConfig
 
     if (Array.isArray(config)) {
       haveMultiConfig = true
@@ -107,7 +103,7 @@ class TsToEffect extends Command {
       description: 'Skip the validation step (not recommended)',
     }),
     inferredTypes: Flags.string({
-      description: 'Path of S.To<> types file',
+      description: 'Path of S.Schema.To<> types file',
     }),
     watch: Flags.boolean({
       char: 'w',
@@ -292,7 +288,7 @@ See more help with --help`,
       }
     }
 
-    errors.map(this.warn)
+    errors.map(this.warn.bind(this))
 
     if (!flags.skipValidation) {
       const validatorSpinner = ora('Validating generated types').start()

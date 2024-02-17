@@ -1,10 +1,10 @@
+import { join } from 'path'
 import {
   createDefaultMapFromNodeModules,
   createFSBackedSystem,
   createVirtualTypeScriptEnvironment,
 } from '@typescript/vfs'
 import ts from 'typescript'
-import { join } from 'path'
 import { resolveDefaultProperties } from '../utils/resolveDefaultProperties'
 interface File {
   sourceText: string

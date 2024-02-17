@@ -25,7 +25,7 @@ describe('transformRecursiveSchema', () => {
     expect(
       printer.printNode(ts.EmitHint.Unspecified, output, sourceFile),
     ).toMatchInlineSnapshot(`
-      "export const categorySchema: ObjectSchema<Category> = S.lazy(() => S.struct({
+      "export const categorySchema: ObjectSchema<Category> = S.suspend(() => S.struct({
           name: S.string,
           subcategories: S.array(categorySchema),
       }));"
