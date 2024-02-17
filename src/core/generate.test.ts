@@ -199,9 +199,8 @@ describe("generate", () => {
             export type ReplaceDateToStringDeep<T> = ReplaceTypeDeep<T, Date, string>;
 
             export type ObjectSchema<T extends object> = S.Schema<
-              never,
-              ReplaceDateToStringDeep<ReadonlyDeep<T>>,
-              ReadonlyDeep<T>
+              ReadonlyDeep<T>,
+              ReplaceDateToStringDeep<ReadonlyDeep<T>>
             >;
 
         export const villainSchema: ObjectSchema<Villain> = S.suspend(() => S.struct({

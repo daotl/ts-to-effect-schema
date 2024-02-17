@@ -1,172 +1,172 @@
-import { camel } from "case";
-import ts from "typescript";
-import { findNode } from "../utils/findNode";
-import { generateSchemaVariableStatement } from "./generateSchema";
+import { camel } from 'case'
+import ts from 'typescript'
+import { findNode } from '../utils/findNode'
+import { generateSchemaVariableStatement } from './generateSchema'
 
-describe("generateSchema", () => {
-  it("should generate a string schema", () => {
-    const source = "export type MyHeroName = string;";
+describe('generateSchema', () => {
+  it('should generate a string schema', () => {
+    const source = 'export type MyHeroName = string;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myHeroNameSchema = S.string;"`
-    );
-  });
+      `"export const myHeroNameSchema = S.string;"`,
+    )
+  })
 
-  it("should generate a number schema", () => {
-    const source = "export type MyHeroAge = number;";
+  it('should generate a number schema', () => {
+    const source = 'export type MyHeroAge = number;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myHeroAgeSchema = S.number;"`
-    );
-  });
+      `"export const myHeroAgeSchema = S.number;"`,
+    )
+  })
 
-  it("should generate an any schema", () => {
-    const source = "export type MyHeroPower = any;";
+  it('should generate an any schema', () => {
+    const source = 'export type MyHeroPower = any;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myHeroPowerSchema = S.any;"`
-    );
-  });
+      `"export const myHeroPowerSchema = S.any;"`,
+    )
+  })
 
-  it("should generate a boolean schema", () => {
-    const source = "export type HavePower = boolean;";
+  it('should generate a boolean schema', () => {
+    const source = 'export type HavePower = boolean;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const havePowerSchema = S.boolean;"`
-    );
-  });
+      `"export const havePowerSchema = S.boolean;"`,
+    )
+  })
 
-  it("should generate an undefined schema", () => {
-    const source = "export type Nothing = undefined;";
+  it('should generate an undefined schema', () => {
+    const source = 'export type Nothing = undefined;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const nothingSchema = S.undefined;"`
-    );
-  });
+      `"export const nothingSchema = S.undefined;"`,
+    )
+  })
 
-  it("should generate a null schema", () => {
-    const source = "export type MyHeroWeakness = null;";
+  it('should generate a null schema', () => {
+    const source = 'export type MyHeroWeakness = null;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myHeroWeaknessSchema = S.null;"`
-    );
-  });
+      `"export const myHeroWeaknessSchema = S.null;"`,
+    )
+  })
 
-  it("should generate a void schema", () => {
-    const source = "export type MyEnemyChance = void;";
+  it('should generate a void schema', () => {
+    const source = 'export type MyEnemyChance = void;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const myEnemyChanceSchema = S.void;"`
-    );
-  });
+      `"export const myEnemyChanceSchema = S.void;"`,
+    )
+  })
 
-  it("should generate a bigint schema", () => {
-    const source = "export type loisLaneCapturedCount = bigint;";
+  it('should generate a bigint schema', () => {
+    const source = 'export type loisLaneCapturedCount = bigint;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const loisLaneCapturedCountSchema = S.bigint;"`
-    );
-  });
+      `"export const loisLaneCapturedCountSchema = S.bigint;"`,
+    )
+  })
 
-  it("should generate a date schema", () => {
-    const source = "export type lastIncidentInMetropolis = Date;";
+  it('should generate a date schema', () => {
+    const source = 'export type lastIncidentInMetropolis = Date;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const lastIncidentInMetropolisSchema = S.Date;"`
-    );
-  });
+      `"export const lastIncidentInMetropolisSchema = S.Date;"`,
+    )
+  })
 
-  it("should generate a literal schema (string)", () => {
-    const source = `export type Kryptonite = "kryptonite";`;
+  it('should generate a literal schema (string)', () => {
+    const source = `export type Kryptonite = "kryptonite";`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const kryptoniteSchema = S.literal("kryptonite");"`
-    );
-  });
+      `"export const kryptoniteSchema = S.literal("kryptonite");"`,
+    )
+  })
 
-  it("should generate a literal schema (number)", () => {
-    const source = "export type IdentitiesCount = 2;";
+  it('should generate a literal schema (number)', () => {
+    const source = 'export type IdentitiesCount = 2;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const identitiesCountSchema = S.literal(2);"`
-    );
-  });
+      `"export const identitiesCountSchema = S.literal(2);"`,
+    )
+  })
 
-  it("should generate a literal schema (true)", () => {
-    const source = "export type IsSuperman = true;";
+  it('should generate a literal schema (true)', () => {
+    const source = 'export type IsSuperman = true;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const isSupermanSchema = S.literal(true);"`
-    );
-  });
+      `"export const isSupermanSchema = S.literal(true);"`,
+    )
+  })
 
-  it("should generate a literal schema (false)", () => {
-    const source = "export type CanBeatEffect = false;";
+  it('should generate a literal schema (false)', () => {
+    const source = 'export type CanBeatEffect = false;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const canBeatEffectSchema = S.literal(false);"`
-    );
-  });
+      `"export const canBeatEffectSchema = S.literal(false);"`,
+    )
+  })
 
-  it("should generate a literal schema (enum)", () => {
+  it('should generate a literal schema (enum)', () => {
     const source = `
     export type BestSuperhero = {
       superhero: Superhero.Superman
     };
-    `;
+    `
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const bestSuperheroSchema = S.struct({
           superhero: S.literal(Superhero.Superman)
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should generate a enums schema", () => {
+  it('should generate a enums schema', () => {
     const source = `export enum Superhero = {
       Superman = "superman",
       ClarkKent = "clark_kent",
-    };`;
+    };`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const superheroSchema = S.enums(Superhero);"`
-    );
-  });
+      `"export const superheroSchema = S.enums(Superhero);"`,
+    )
+  })
 
-  it("should generate a never", () => {
-    const source = "export type CanBeatEffect = never;";
+  it('should generate a never', () => {
+    const source = 'export type CanBeatEffect = never;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const canBeatEffectSchema = S.never;"`
-    );
-  });
+      `"export const canBeatEffectSchema = S.never;"`,
+    )
+  })
 
-  it("should map unknown type correctly", () => {
-    const source = "export type T = unknown;";
+  it('should map unknown type correctly', () => {
+    const source = 'export type T = unknown;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const tSchema = S.unknown;"`
-    );
-  });
+      `"export const tSchema = S.unknown;"`,
+    )
+  })
 
-  it("should generate an array schema (T[] notation)", () => {
-    const source = "export type Villains = string[];";
+  it('should generate an array schema (T[] notation)', () => {
+    const source = 'export type Villains = string[];'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const villainsSchema = S.array(S.string);"`
-    );
-  });
+      `"export const villainsSchema = S.array(S.string);"`,
+    )
+  })
 
-  it("should generate an array schema (Array<T> notation)", () => {
-    const source = "export type Villains = Array<string>;";
+  it('should generate an array schema (Array<T> notation)', () => {
+    const source = 'export type Villains = Array<string>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const villainsSchema = S.array(S.string);"`
-    );
-  });
+      `"export const villainsSchema = S.array(S.string);"`,
+    )
+  })
 
-  it("should generate a tuple schema", () => {
-    const source = "export type Life = [LoisLane, Problem[]];";
+  it('should generate a tuple schema', () => {
+    const source = 'export type Life = [LoisLane, Problem[]];'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const lifeSchema = S.tuple(loisLaneSchema, S.array(problemSchema));"`
-    );
-  });
+      `"export const lifeSchema = S.tuple(loisLaneSchema, S.array(problemSchema));"`,
+    )
+  })
 
-  it("should generate a tuple schema (named)", () => {
-    const source = "export type Story = [subject: string, problems: string[]];";
+  it('should generate a tuple schema (named)', () => {
+    const source = 'export type Story = [subject: string, problems: string[]];'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const storySchema = S.tuple(S.string, S.array(S.string));"`
-    );
-  });
+      `"export const storySchema = S.tuple(S.string, S.array(S.string));"`,
+    )
+  })
 
-  it("should generate an object schema", () => {
+  it('should generate an object schema', () => {
     const source = `export type Superman = {
      name: "superman";
      weakness: Kryptonite;
      age: number;
      enemies: Array<string>;
-   };`;
+   };`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const supermanSchema = S.struct({
           name: S.literal("superman"),
@@ -174,10 +174,10 @@ describe("generateSchema", () => {
           age: S.number,
           enemies: S.array(S.string)
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should generate a numerical key", () => {
+  it('should generate a numerical key', () => {
     const source = `export type responses = {
      200: {
       content: {
@@ -186,7 +186,7 @@ describe("generateSchema", () => {
         }
       }
      }
-   };`;
+   };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const responsesSchema = S.struct({
@@ -198,8 +198,8 @@ describe("generateSchema", () => {
               })
           })
       });"
-    `);
-  });
+    `)
+  })
 
   // it('should generate a promise schema', () => {
   //   const source = 'export type KrytonResponse = Promise<boolean>'
@@ -208,50 +208,50 @@ describe("generateSchema", () => {
   //   )
   // })
 
-  it("should generate a referenced schema", () => {
-    const source = "export type Villain = BadGuy;";
+  it('should generate a referenced schema', () => {
+    const source = 'export type Villain = BadGuy;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const villainSchema = badGuySchema;"`
-    );
-  });
+      `"export const villainSchema = badGuySchema;"`,
+    )
+  })
 
-  it("should generate a union schema", () => {
-    const source = `export type Identity = "superman" | "clark kent";`;
+  it('should generate a union schema', () => {
+    const source = `export type Identity = "superman" | "clark kent";`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const identitySchema = S.union(S.literal("superman"), S.literal("clark kent"));"`
-    );
-  });
+      `"export const identitySchema = S.union(S.literal("superman"), S.literal("clark kent"));"`,
+    )
+  })
 
-  it("should generate a literal schema for a single union", () => {
-    const source = `export type Identity = | "superman";`;
+  it('should generate a literal schema for a single union', () => {
+    const source = `export type Identity = | "superman";`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const identitySchema = S.literal("superman");"`
-    );
-  });
+      `"export const identitySchema = S.literal("superman");"`,
+    )
+  })
 
-  it("should generate two joined schemas", () => {
+  it('should generate two joined schemas', () => {
     const source =
-      "export type SupermanWithWeakness = Superman & { weakness: Kryptonite };";
+      'export type SupermanWithWeakness = Superman & { weakness: Kryptonite };'
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const supermanWithWeaknessSchema = supermanSchema.pipe(S.extend(omitCommonProperties(S.struct({
           weakness: kryptoniteSchema
       }), supermanSchema)));"
-    `);
-  });
+    `)
+  })
 
-  it("should generate a record schema", () => {
-    const source = "export type EnemiesPowers = Record<string, Power>;";
+  it('should generate a record schema', () => {
+    const source = 'export type EnemiesPowers = Record<string, Power>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const enemiesPowersSchema = S.record(S.string, powerSchema);"`
-    );
-  });
+      `"export const enemiesPowersSchema = S.record(S.string, powerSchema);"`,
+    )
+  })
 
-  it("should generate a set schema", () => {
-    const source = "export type EnemiesPowers = Set<string>;";
+  it('should generate a set schema', () => {
+    const source = 'export type EnemiesPowers = Set<string>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const enemiesPowersSchema = S.set(S.string);"`
-    );
-  });
+      `"export const enemiesPowersSchema = S.set(S.string);"`,
+    )
+  })
 
   // it('should generate a function schema', () => {
   //   const source =
@@ -280,117 +280,117 @@ describe("generateSchema", () => {
   //   )
   // })
 
-  it("should throw on non string record", () => {
-    const source = "export type UnsupportedType = Record<number, number>;";
+  it('should throw on non string record', () => {
+    const source = 'export type UnsupportedType = Record<number, number>;'
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"Record<number, …> are not supported (https://github.com/effect-ts/schema#records)"`
-    );
-  });
+      `"Record<number, …> are not supported (https://github.com/effect-ts/schema#records)"`,
+    )
+  })
 
-  it("should throw on not supported key in omit", () => {
-    const source = "export type UnsupportedType = Omit<Superman, Krytonite>;";
+  it('should throw on not supported key in omit', () => {
+    const source = 'export type UnsupportedType = Omit<Superman, Krytonite>;'
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"Omit<T, K> unknown syntax: (TypeReference as K not supported)"`
-    );
-  });
+      `"Omit<T, K> unknown syntax: (TypeReference as K not supported)"`,
+    )
+  })
 
-  it("should throw on not supported interface with extends and index signature", () => {
+  it('should throw on not supported interface with extends and index signature', () => {
     const source = `export interface Superman extends Clark {
      [key: string]: any;
-   };`;
+   };`
 
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"interface with \`extends\` and index signature are not supported!"`
-    );
-  });
+      `"interface with \`extends\` and index signature are not supported!"`,
+    )
+  })
 
-  it("should throw on not supported key in omit (union)", () => {
+  it('should throw on not supported key in omit (union)', () => {
     const source =
-      "export type UnsupportedType = Omit<Superman, Krytonite | LoisLane>;";
+      'export type UnsupportedType = Omit<Superman, Krytonite | LoisLane>;'
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"Omit<T, K> unknown syntax: (TypeReference as K union part not supported)"`
-    );
-  });
+      `"Omit<T, K> unknown syntax: (TypeReference as K union part not supported)"`,
+    )
+  })
 
-  it("should throw on not supported key in pick", () => {
-    const source = "export type UnsupportedType = Pick<Superman, Krytonite>;";
+  it('should throw on not supported key in pick', () => {
+    const source = 'export type UnsupportedType = Pick<Superman, Krytonite>;'
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"Pick<T, K> unknown syntax: (TypeReference as K not supported)"`
-    );
-  });
+      `"Pick<T, K> unknown syntax: (TypeReference as K not supported)"`,
+    )
+  })
 
-  it("should throw on not supported key in pick (union)", () => {
+  it('should throw on not supported key in pick (union)', () => {
     const source =
-      "export type UnsupportedType = Pick<Superman, Krytonite | LoisLane>;";
+      'export type UnsupportedType = Pick<Superman, Krytonite | LoisLane>;'
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"Pick<T, K> unknown syntax: (TypeReference as K union part not supported)"`
-    );
-  });
+      `"Pick<T, K> unknown syntax: (TypeReference as K union part not supported)"`,
+    )
+  })
 
-  it("should fallback on the original type for Readonly<T>", () => {
-    const source = "export type ReadonlySuperman = Readonly<Superman>;";
+  it('should fallback on the original type for Readonly<T>', () => {
+    const source = 'export type ReadonlySuperman = Readonly<Superman>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const readonlySupermanSchema = supermanSchema;"`
-    );
-  });
+      `"export const readonlySupermanSchema = supermanSchema;"`,
+    )
+  })
 
-  it("should fallback on Array for ReadonlyArray<T>", () => {
-    const source = "export type ReadonlySupermen = ReadonlyArray<Superman>;";
+  it('should fallback on Array for ReadonlyArray<T>', () => {
+    const source = 'export type ReadonlySupermen = ReadonlyArray<Superman>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const readonlySupermenSchema = S.array(supermanSchema);"`
-    );
-  });
+      `"export const readonlySupermenSchema = S.array(supermanSchema);"`,
+    )
+  })
 
-  it("should generate a partial schema", () => {
-    const source = "export type SupermanUnderKryptonite = Partial<Hero>;";
+  it('should generate a partial schema', () => {
+    const source = 'export type SupermanUnderKryptonite = Partial<Hero>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanUnderKryptoniteSchema = S.partial(heroSchema);"`
-    );
-  });
+      `"export const supermanUnderKryptoniteSchema = S.partial(heroSchema);"`,
+    )
+  })
 
-  it("should generate a required schema", () => {
-    const source = "export type IDidFindYou = Required<VillainLocation>;";
+  it('should generate a required schema', () => {
+    const source = 'export type IDidFindYou = Required<VillainLocation>;'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const iDidFindYouSchema = S.required(villainLocationSchema);"`
-    );
-  });
+      `"export const iDidFindYouSchema = S.required(villainLocationSchema);"`,
+    )
+  })
 
-  it("should generate a schema with omit", () => {
-    const source = `export type InvincibleSuperman = Omit<Superman, "weakness">;`;
+  it('should generate a schema with omit', () => {
+    const source = `export type InvincibleSuperman = Omit<Superman, "weakness">;`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const invincibleSupermanSchema = supermanSchema.omit({ "weakness": true });"`
-    );
-  });
+      `"export const invincibleSupermanSchema = supermanSchema.omit({ "weakness": true });"`,
+    )
+  })
 
-  it("should generate a schema with omit (multiple keys)", () => {
-    const source = `export type VeryInvincibleSuperman = Omit<Superman, "weakness" | "wife">;`;
+  it('should generate a schema with omit (multiple keys)', () => {
+    const source = `export type VeryInvincibleSuperman = Omit<Superman, "weakness" | "wife">;`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const veryInvincibleSupermanSchema = supermanSchema.omit({ "weakness": true, "wife": true });"`
-    );
-  });
+      `"export const veryInvincibleSupermanSchema = supermanSchema.omit({ "weakness": true, "wife": true });"`,
+    )
+  })
 
-  it("should generate a schema with pick", () => {
-    const source = `export type YouJustKnowMyName = Pick<SecretIdentity, "name">;`;
+  it('should generate a schema with pick', () => {
+    const source = `export type YouJustKnowMyName = Pick<SecretIdentity, "name">;`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const youJustKnowMyNameSchema = secretIdentitySchema.pick({ "name": true });"`
-    );
-  });
+      `"export const youJustKnowMyNameSchema = secretIdentitySchema.pick({ "name": true });"`,
+    )
+  })
 
-  it("should generate a schema with pick (multiple keys)", () => {
-    const source = `export type YouKnowTooMuch = Pick<SecretIdentity, "name" | "location">;`;
+  it('should generate a schema with pick (multiple keys)', () => {
+    const source = `export type YouKnowTooMuch = Pick<SecretIdentity, "name" | "location">;`
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const youKnowTooMuchSchema = secretIdentitySchema.pick({ "name": true, "location": true });"`
-    );
-  });
+      `"export const youKnowTooMuchSchema = secretIdentitySchema.pick({ "name": true, "location": true });"`,
+    )
+  })
 
-  it("should generate a complex schema from an interface", () => {
+  it('should generate a complex schema from an interface', () => {
     const source = `export interface Superman {
      name: "superman" | "clark kent" | "kal-l";
      enemies: Record<string, Enemy>;
      age: number;
      underKryptonite?: boolean;
      needGlasses: true | null;
-   };`;
+   };`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const supermanSchema = S.struct({
           name: S.union(S.literal("superman"), S.literal("clark kent"), S.literal("kal-l")),
@@ -399,257 +399,257 @@ describe("generateSchema", () => {
           underKryptonite: S.optional(S.boolean),
           needGlasses: S.nullable(S.literal(true))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should generate an extended schema", () => {
+  it('should generate an extended schema', () => {
     const source = `export interface Superman extends Clark {
      withPower: boolean;
-   }`;
+   }`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
       }), clarkSchema)));"
-    `);
-  });
+    `)
+  })
 
-  it("should generate an variable assignment if an extending type has no new fields", () => {
-    const source = "export interface Superman extends Clark {}";
+  it('should generate an variable assignment if an extending type has no new fields', () => {
+    const source = 'export interface Superman extends Clark {}'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanSchema = clarkSchema;"`
-    );
-  });
+      `"export const supermanSchema = clarkSchema;"`,
+    )
+  })
 
-  it("should generate a merged schema when two extends are used", () => {
+  it('should generate a merged schema when two extends are used', () => {
     const source = `export interface Superman extends Clark extends KalL {
         withPower: boolean;
-     };`;
+     };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
       }), clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))))));"
-    `);
-  });
+    `)
+  })
 
-  it("should generate a merged schema when extending with two comma-separated interfaces", () => {
+  it('should generate a merged schema when extending with two comma-separated interfaces', () => {
     const source = `export interface Superman extends Clark, KalL {
         withPower: boolean;
-     };`;
+     };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
       }), clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))))));"
-    `);
-  });
+    `)
+  })
 
-  it("should generate a merged schema when extending with multiple comma-separated interfaces", () => {
+  it('should generate a merged schema when extending with multiple comma-separated interfaces', () => {
     const source = `export interface Superman extends Clark, KalL, Kryptonian {
         withPower: boolean;
-     };`;
+     };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const supermanSchema = clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(kryptonianSchema, clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema)))))).pipe(S.extend(omitCommonProperties(S.struct({
           withPower: S.boolean
       }), clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema))).pipe(S.extend(omitCommonProperties(kryptonianSchema, clarkSchema.pipe(S.extend(omitCommonProperties(kalLSchema, clarkSchema)))))))));"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with literal keys", () => {
+  it('should deal with literal keys', () => {
     const source = `export interface Villain {
      "i.will.kill.everybody": true;
-   };`;
+   };`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const villainSchema = S.struct({
           "i.will.kill.everybody": S.literal(true)
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with index access type (1st level)", () => {
-    const source = `export type SupermanName = Superman["name"]`;
-
-    expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanNameSchema = getPropertySchemas(supermanSchema).name;"`
-    );
-  });
-
-  it("should deal with index access type (nested level)", () => {
-    const source = `export type SupermanFlyPower = Superman["power"]["fly"]`;
+  it('should deal with index access type (1st level)', () => {
+    const source = `export type SupermanName = Superman["name"]`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanFlyPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).power).fly;"`
-    );
-  });
+      `"export const supermanNameSchema = getPropertySchemas(supermanSchema).name;"`,
+    )
+  })
 
-  it("should deal with index access type (array item)", () => {
+  it('should deal with index access type (nested level)', () => {
+    const source = `export type SupermanFlyPower = Superman["power"]["fly"]`
+
+    expect(generate(source)).toMatchInlineSnapshot(
+      `"export const supermanFlyPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).power).fly;"`,
+    )
+  })
+
+  it('should deal with index access type (array item)', () => {
     const source = `export type SupermanPower = Superman["powers"][-1];
 
     export type Superman = {
       powers: Array<Power>
-    };`;
+    };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`
-    );
-  });
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
+    )
+  })
 
-  it("should deal with index access type (array item bis)", () => {
+  it('should deal with index access type (array item bis)', () => {
     const source = `export type SupermanPower = Superman["powers"][-1];
 
     export type Superman = {
       powers: Power[]
-    };`;
+    };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`
-    );
-  });
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
+    )
+  })
 
-  it("should deal with index access type (record item)", () => {
+  it('should deal with index access type (record item)', () => {
     const source = `export type SupermanPower = Superman["powers"][-1];
 
     export type Superman = {
       powers: Record<string, Power>
-    };`;
+    };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`
-    );
-  });
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`,
+    )
+  })
 
-  it("should deal with index access type (record item) (interface)", () => {
+  it('should deal with index access type (record item) (interface)', () => {
     const source = `export type SupermanPower = Superman["powers"][-1];
 
     export interface Superman {
       powers: Record<string, Power>
-    };`;
+    };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`
-    );
-  });
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`,
+    )
+  })
 
-  it("should deal with index access type (tuple)", () => {
+  it('should deal with index access type (tuple)', () => {
     const source = `export type SupermanPower = Superman["powers"][1];
 
     export type Superman = {
       powers: ["fly", "burnStuff"]
-    };`;
+    };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).[1];"`
-    );
-  });
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).[1];"`,
+    )
+  })
 
   // TODO
-  it.skip("should deal with index access type (nested array item)", () => {
+  it.skip('should deal with index access type (nested array item)', () => {
     const source = `export type SupermanPower = Superman["powers"][-1][-1];
 
     export type Superman = {
       powers: Power[][]
-    };`;
+    };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = supermanSchema.shape.powers.element.element;"`
-    );
-  });
+      `"export const supermanPowerSchema = supermanSchema.shape.powers.element.element;"`,
+    )
+  })
 
-  it("should deal with index access type (inline array item)", () => {
+  it('should deal with index access type (inline array item)', () => {
     const source = `export type SupermanPower = Superman["powers"][-1];
 
     export type Superman = {
       powers: Array<{type: string}>
-    };`;
+    };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`
-    );
-  });
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
+    )
+  })
 
-  it("should deal with index access type (inline array item bis)", () => {
+  it('should deal with index access type (inline array item bis)', () => {
     const source = `export type SupermanPower = Superman["powers"][-1];
 
     export type Superman = {
       powers: {type: string}[]
-    };`;
+    };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`
-    );
-  });
+      `"export const supermanPowerSchema = getPropertySchemas(getPropertySchemas(supermanSchema).powers).element;"`,
+    )
+  })
 
-  it("should deal with index access type (inline record)", () => {
+  it('should deal with index access type (inline record)', () => {
     const source = `export type SupermanPower = Superman["powers"][-1];
 
     export type Superman = {
       powers: Record<string, {type: string}>
-    };`;
+    };`
 
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`
-    );
-  });
+      `"export const supermanPowerSchema = getPropertySchemas(supermanSchema).powers;"`,
+    )
+  })
 
-  it("should deal with parenthesized type", () => {
-    const source = "export type SecretVillain = (NormalGuy | Villain);";
+  it('should deal with parenthesized type', () => {
+    const source = 'export type SecretVillain = (NormalGuy | Villain);'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const secretVillainSchema = S.union(normalGuySchema, villainSchema);"`
-    );
-  });
+      `"export const secretVillainSchema = S.union(normalGuySchema, villainSchema);"`,
+    )
+  })
 
-  it("should deal with index signature", () => {
-    const source = "export type Movies = {[title: string]: Movie};";
+  it('should deal with index signature', () => {
+    const source = 'export type Movies = {[title: string]: Movie};'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const moviesSchema = S.record(S.string, movieSchema);"`
-    );
-  });
+      `"export const moviesSchema = S.record(S.string, movieSchema);"`,
+    )
+  })
 
-  it("should deal with composed index signature", () => {
+  it('should deal with composed index signature', () => {
     const source = `export type Movies = {
       "Man of Steel": Movie & {title: "Man of Steel"};
       [title: string]: Movie;
-    };`;
+    };`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const moviesSchema = S.record(S.string, movieSchema).and(S.struct({
           "Man of Steel": movieSchema.pipe(S.extend(omitCommonProperties(S.struct({
               title: S.literal("Man of Steel")
           }), movieSchema)))
       }));"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with optional index signature", () => {
+  it('should deal with optional index signature', () => {
     const source = `export interface Collection {
       movies?: {[title: string] : Movie}
-    }`;
+    }`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const collectionSchema = S.struct({
           movies: S.optional(S.record(S.string, movieSchema))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with optional array", () => {
+  it('should deal with optional array', () => {
     const source = `export interface Collection {
       movies?: Array<string>
-    }`;
+    }`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const collectionSchema = S.struct({
           movies: S.optional(S.array(S.string))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should generate an empty object schema", () => {
-    const source = "export type Empty = {};";
+  it('should generate an empty object schema', () => {
+    const source = 'export type Empty = {};'
     expect(generate(source)).toMatchInlineSnapshot(
-      `"export const emptySchema = S.struct({});"`
-    );
-  });
+      `"export const emptySchema = S.struct({});"`,
+    )
+  })
 
-  it("should generate custom validators based on jsdoc tags", () => {
+  it('should generate custom validators based on jsdoc tags', () => {
     const source = `export interface HeroContact {
       /**
        * The email of the hero.
@@ -687,7 +687,7 @@ describe("generateSchema", () => {
        * @maximum 500
        */
       age: number;
-    }`;
+    }`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const heroContactSchema = S.struct({
           /**
@@ -725,10 +725,10 @@ describe("generateSchema", () => {
            */
           age: S.number.pipe(S.greaterThanOrEqualTo(0)).pipe(S.lessThanOrEqualTo(500))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should generate custom error message for `format` tag", () => {
+  it('should generate custom error message for `format` tag', () => {
     const source = `export interface HeroContact {
       /**
        * The email of the hero.
@@ -750,7 +750,7 @@ describe("generateSchema", () => {
        * @format email "Should be an email"
        */
       supermanEmail: string;
-    }`;
+    }`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const heroContactSchema = S.struct({
           /**
@@ -772,10 +772,10 @@ describe("generateSchema", () => {
            */
           supermanEmail: S.string.pipe(S.email("Should be an email"))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should generate custom error message based on jsdoc tags", () => {
+  it('should generate custom error message based on jsdoc tags', () => {
     const source = `export interface HeroContact {
       /**
        * The email of the hero.
@@ -799,7 +799,7 @@ describe("generateSchema", () => {
        * @maximum 500, "you are too old"
        */
       age: number;
-    }`;
+    }`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const heroContactSchema = S.struct({
           /**
@@ -823,24 +823,24 @@ describe("generateSchema", () => {
            */
           age: S.number.pipe(S.greaterThanOrEqualTo(0, "you are too young")).pipe(S.lessThanOrEqualTo(500, "you are too old"))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should generate validator on top-level types", () => {
+  it('should generate validator on top-level types', () => {
     const source = `/**
     * @minLength 1
     */
-    export type NonEmptyString = string;`;
+    export type NonEmptyString = string;`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "/**
           * @minLength 1
           */
       export const nonEmptyStringSchema = S.string.pipe(S.minLength(1));"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with nullable", () => {
+  it('should deal with nullable', () => {
     const source = `export interface A {
       /** @minimum 0 */
       a: number | null;
@@ -849,7 +849,7 @@ describe("generateSchema", () => {
       /** @pattern ^c$ */
       c: string | null;
     }
-    `;
+    `
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const aSchema = S.struct({
@@ -860,38 +860,38 @@ describe("generateSchema", () => {
           /** @pattern ^c$ */
           c: S.nullable(S.string.pipe(S.pattern(/^c$/)))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should allow nullable on optional properties", () => {
+  it('should allow nullable on optional properties', () => {
     const source = `export interface A {
       a?: number | null;
     }
-    `;
+    `
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const aSchema = S.struct({
           a: S.optional(S.nullable(S.number))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with array of null or null", () => {
+  it('should deal with array of null or null', () => {
     const source = `export type Example = {
         field?: Array<string | null> | null
-    }`;
+    }`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const exampleSchema = S.struct({
           field: S.optional(S.nullable(S.array(S.nullable(S.string))))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with partial or null", () => {
+  it('should deal with partial or null', () => {
     const source = `export type Example = {
         field: Partial<{foo: string}> | null
-    }`;
+    }`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const exampleSchema = S.struct({
@@ -899,60 +899,60 @@ describe("generateSchema", () => {
               foo: S.string
           })))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with ReadonlyArray or null", () => {
+  it('should deal with ReadonlyArray or null', () => {
     const source = `export type Example = {
         field: ReadonlyArray<"foo" | "bar"> | null
-    }`;
+    }`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const exampleSchema = S.struct({
           field: S.nullable(S.array(S.union(S.literal("foo"), S.literal("bar"))))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with Record or null", () => {
+  it('should deal with Record or null', () => {
     const source = `export type Example = {
         field: Record<string, string> | null
-    }`;
+    }`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const exampleSchema = S.struct({
           field: S.nullable(S.record(S.string, S.string))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should allow nullable on union properties", () => {
+  it('should allow nullable on union properties', () => {
     const source = `export interface A {
       a: number | string | null;
     }
-    `;
+    `
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const aSchema = S.struct({
           a: S.nullable(S.union(S.number, S.string))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should allow nullable on optional union properties", () => {
+  it('should allow nullable on optional union properties', () => {
     const source = `export interface A {
       a?: number | string | null;
     }
-    `;
+    `
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const aSchema = S.struct({
           a: S.nullable(S.optional(S.union(S.number, S.string)))
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should deal with @default with all types", () => {
+  it('should deal with @default with all types', () => {
     const source = `export interface WithDefaults {
      /**
       * @default 42
@@ -978,7 +978,7 @@ describe("generateSchema", () => {
        * @default "true"
        */
       booleanAsString: string;
-   }`;
+   }`
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const withDefaultsSchema = S.struct({
           /**
@@ -1018,10 +1018,10 @@ describe("generateSchema", () => {
                   default: () => 'true' as const
                 })
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should ignore unknown/broken jsdoc format", () => {
+  it('should ignore unknown/broken jsdoc format', () => {
     const source = `export interface Hero {
      /**
       * @secret
@@ -1037,7 +1037,7 @@ describe("generateSchema", () => {
       * My super power
       */
      power: Power;
-   };`;
+   };`
 
     expect(generate(source)).toMatchInlineSnapshot(`
       "export const heroSchema = S.struct({
@@ -1056,43 +1056,43 @@ describe("generateSchema", () => {
            */
           power: powerSchema
       });"
-    `);
-  });
+    `)
+  })
 
-  it("should throw on generics", () => {
+  it('should throw on generics', () => {
     const source = `export interface Villain<TPower> {
      powers: TPower[]
-   }`;
+   }`
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"Interface with generics are not supported!"`
-    );
-  });
+      `"Interface with generics are not supported!"`,
+    )
+  })
 
-  it("should throw on interface with generics", () => {
+  it('should throw on interface with generics', () => {
     const source = `export interface Villain<TPower> {
      powers: TPower[]
-   }`;
+   }`
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"Interface with generics are not supported!"`
-    );
-  });
+      `"Interface with generics are not supported!"`,
+    )
+  })
 
-  it("should throw on type with generics", () => {
-    const source = "export type SecretVillain<T> = RandomPeople<T>";
+  it('should throw on type with generics', () => {
+    const source = 'export type SecretVillain<T> = RandomPeople<T>'
     expect(() => generate(source)).toThrowErrorMatchingInlineSnapshot(
-      `"Type with generics are not supported!"`
-    );
-  });
+      `"Type with generics are not supported!"`,
+    )
+  })
 
-  it("should be able to override the effect import value", () => {
-    const source = "export type TheLastTest = true";
+  it('should be able to override the effect import value', () => {
+    const source = 'export type TheLastTest = true'
 
-    expect(generate(source, "effect")).toMatchInlineSnapshot(
-      `"export const theLastTestSchema = effect.literal(true);"`
-    );
-  });
+    expect(generate(source, 'effect')).toMatchInlineSnapshot(
+      `"export const theLastTestSchema = effect.literal(true);"`,
+    )
+  })
 
-  it("should not generate any effect validation if `skipParseJSDoc` is `true`", () => {
+  it('should not generate any effect validation if `skipParseJSDoc` is `true`', () => {
     const source = `export interface A {
       /** @minimum 0 */
       a: number | null;
@@ -1100,9 +1100,9 @@ describe("generateSchema", () => {
       b: string | null;
       /** @pattern ^c$ */
       c: string | null;
-    }`;
+    }`
 
-    expect(generate(source, "S", true)).toMatchInlineSnapshot(`
+    expect(generate(source, 'S', true)).toMatchInlineSnapshot(`
       "export const aSchema = S.struct({
           /** @minimum 0 */
           a: S.nullable(S.number),
@@ -1111,9 +1111,9 @@ describe("generateSchema", () => {
           /** @pattern ^c$ */
           c: S.nullable(S.string)
       });"
-    `);
-  });
-});
+    `)
+  })
+})
 
 /**
  * Wrapper to generate a effect schema from a string.
@@ -1123,27 +1123,27 @@ describe("generateSchema", () => {
  */
 function generate(sourceText: string, z?: string, skipParseJSDoc?: boolean) {
   const sourceFile = ts.createSourceFile(
-    "index.ts",
+    'index.ts',
     sourceText,
-    ts.ScriptTarget.Latest
-  );
+    ts.ScriptTarget.Latest,
+  )
   const declaration = findNode(
     sourceFile,
     (
-      node
+      node,
     ): node is
       | ts.InterfaceDeclaration
       | ts.TypeAliasDeclaration
       | ts.EnumDeclaration =>
       ts.isInterfaceDeclaration(node) ||
       ts.isTypeAliasDeclaration(node) ||
-      ts.isEnumDeclaration(node)
-  );
+      ts.isEnumDeclaration(node),
+  )
   if (!declaration) {
-    throw new Error("No `type` or `interface` found!");
+    throw new Error('No `type` or `interface` found!')
   }
-  const interfaceName = declaration.name.text;
-  const effectConstName = `${camel(interfaceName)}Schema`;
+  const interfaceName = declaration.name.text
+  const effectConstName = `${camel(interfaceName)}Schema`
 
   const effectSchema = generateSchemaVariableStatement({
     schemaImportValue: z,
@@ -1151,8 +1151,8 @@ function generate(sourceText: string, z?: string, skipParseJSDoc?: boolean) {
     sourceFile,
     varName: effectConstName,
     skipParseJSDoc,
-  });
+  })
   return ts
     .createPrinter({ newLine: ts.NewLineKind.LineFeed })
-    .printNode(ts.EmitHint.Unspecified, effectSchema.statement, sourceFile);
+    .printNode(ts.EmitHint.Unspecified, effectSchema.statement, sourceFile)
 }

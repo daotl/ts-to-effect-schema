@@ -380,9 +380,8 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
     export type ReplaceDateToStringDeep<T> = ReplaceTypeDeep<T, Date, string>;
 
     export type ObjectSchema<T extends object> = S.Schema<
-      never,
-      ReplaceDateToStringDeep<ReadonlyDeep<T>>,
-      ReadonlyDeep<T>
+      ReadonlyDeep<T>,
+      ReplaceDateToStringDeep<ReadonlyDeep<T>>
     >;\n`
     : ''
 }${
@@ -391,9 +390,9 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
     ? `\n// https://github.com/Effect-TS/schema/releases/tag/v0.18.0
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     export const getPropertySchemas = <I extends { [K in keyof A]: any }, A>(
-      schema: S.Schema<never,I, A>
-    ): { [K in keyof A]: S.Schema<never, I[K], A[K]> } => {
-      const out: Record<PropertyKey, S.Schema<never,unknown>> = {}
+      schema: S.Schema<A,I>
+    ): { [K in keyof A]: S.Schema<A[K], I[K]> } => {
+      const out: Record<PropertyKey, S.Schema<unknown, unknown>> = {}
       const propertySignatures = AST.getPropertySignatures(S.to(schema).ast)
       for (let i = 0; i < propertySignatures.length; i++) {
         const propertySignature = propertySignatures[i] as AST.PropertySignature
@@ -416,11 +415,11 @@ ${typeFestModule ? `import type { ${typeFestModule} } from "type-fest";` : ''}${
       IB extends { [K in keyof B]?: unknown },
       B,
       R = IsEmptyObject<CommonKey<A, B>> extends true
-        ? S.Schema<never, I, A>
-        : S.Schema<never, Omit<I, keyof CommonKey<I, IB>>, Omit<A, keyof CommonKey<A, B>>>
+        ? S.Schema<A, I>
+        : S.Schema<Omit<A, keyof CommonKey<A, B>>, Omit<I, keyof CommonKey<I, IB>>>
     >(
-      self: S.Schema<never, I, A>,
-      that: S.Schema<never, IB, B>
+      self: S.Schema<A, I>,
+      that: S.Schema<B, IB>
     ): R => {
       const selfObj = getPropertySchemas(self);
       const thatObj = getPropertySchemas(that);
